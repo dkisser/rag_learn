@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 from rag_learn.loader import load_documents
 from rag_learn.retriever.base import Hit
@@ -29,21 +30,27 @@ class ChromaRetriever:
             return
         ids = [f"{c.source_file}::{c.chunk_index}" for c in chunks]
         documents = [c.text for c in chunks]
-        metadatas = [{"source_file": c.source_file, "chunk_index": c.chunk_index} for c in chunks]
+        # Chroma's Metadata type is Mapping[str, str | int | float], so widen
+        # chunk_index to float (chunks store int, but the wire format is wider).
+        metadatas: list[dict[str, str | int | float]] = [
+            {"source_file": c.source_file, "chunk_index": c.chunk_index} for c in chunks
+        ]
         # Insert in one call; chromadb batches internally.
-        self._collection.add(ids=ids, documents=documents, metadatas=metadatas)
+        self._collection.add(ids=ids, documents=documents, metadatas=cast(Any, metadatas))
 
     def search(self, query: str, k: int = 5) -> list[Hit]:
         result = self._collection.query(query_texts=[query], n_results=k)
-        documents = result.get("documents", [[]])[0]
-        metadatas = result.get("metadatas", [[]])[0]
-        distances = result.get("distances", [[]])[0]
+        # result.get may return None per the stub; default to [] and treat any
+        # None as "no results" (Chroma only returns None for empty collections).
+        documents = result.get("documents") or [[]]
+        metadatas = result.get("metadatas") or [[]]
+        distances = result.get("distances") or [[]]
         hits: list[Hit] = []
-        for text, meta, dist in zip(documents, metadatas, distances):
+        for text, meta, dist in zip(documents[0], metadatas[0], distances[0], strict=False):
             hits.append(
                 Hit(
-                    text=text,
-                    source_file=meta["source_file"],
+                    text=str(text),
+                    source_file=str(meta["source_file"]),
                     chunk_index=int(meta["chunk_index"]),
                     score=float(dist),
                 )

@@ -60,7 +60,7 @@ class MilvusRetriever:
         texts = [c.text for c in chunks]
         embeddings = self._embedder.encode_documents(texts)
         rows: list[dict[str, Any]] = []
-        for c, emb in zip(chunks, embeddings):
+        for c, emb in zip(chunks, embeddings, strict=False):
             rows.append(
                 {
                     "text": c.text,

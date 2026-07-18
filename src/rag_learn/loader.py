@@ -93,7 +93,6 @@ def _chunk_text(text: str, source_file: str, start_offset: int = 0) -> list[Chun
         buf = text[new_local:end_in_text]
         chunk_start = new_local
         local_offset = end_in_text
-        cursor = end_in_text
 
     for para in paragraphs:
         para = para.strip()
