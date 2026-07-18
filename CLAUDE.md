@@ -14,7 +14,8 @@ shows one streamed answer + a collapsible retrieved-chunks panel per side.
 All commands live in the `Makefile`. The typechecker is **Astral's `ty`**
 (`make typecheck` runs `ty check src`) — *not* `mypy`.
 
-- `make install` — `pip install -e ".[dev]"`
+- `make install` — `pip install -e ".[dev]"` (pip-based)
+- `make uv-sync` — `uv sync --extra dev` (uv-based; uses the committed `uv.lock`)
 - `make test` — `pytest`. The `pyproject.toml` `[tool.pytest.ini_options]` block
   enforces `--cov-fail-under=80` on `src/rag_learn`, so coverage below 80% fails
   the run.
@@ -23,6 +24,10 @@ All commands live in the `Makefile`. The typechecker is **Astral's `ty`**
 - `make all` — `lint + typecheck + test`. **Run this before committing.**
 
 `make clean` also wipes `data/`; the next `python main.py` re-ingests.
+
+Under uv, prefix test/lint/format/typecheck with `uv run …` (or activate
+`.venv` via `source .venv/bin/activate`). The Makefile targets work in
+both environments.
 
 ## Required env vars
 

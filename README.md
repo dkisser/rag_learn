@@ -7,6 +7,14 @@ its own collapsible retrieved-chunks panel and per-stream perf metrics.
 ## Quick start
 
 ```bash
+# Option A — uv (recommended; uses the committed uv.lock)
+uv sync --extra dev
+cp .env.example .env
+# edit .env to set DEEPSEEK_API_KEY
+uv run python main.py
+# open http://127.0.0.1:7860
+
+# Option B — pip
 pip install -e ".[dev]"
 cp .env.example .env
 # edit .env to set DEEPSEEK_API_KEY
@@ -44,6 +52,8 @@ python main.py
 
 ```bash
 make all   # ruff lint + ty + pytest --cov-fail-under=80
+# or, under uv:
+uv run pytest
 ```
 
 Per-retriever model downloads happen once on first ingest; cached after.

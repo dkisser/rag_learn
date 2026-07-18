@@ -14,7 +14,13 @@ dependencies = [
     # default embedder path was removed in favor of `pymilvus[model]`. We
     # pull in both extras to enable Lite (embedded) mode + the
     # SentenceTransformerEmbeddingFunction used by MilvusRetriever.
+    # `sentence-transformers` is also listed explicitly below because uv's
+    # lock resolver doesn't always pull transitive extras from a single
+    # `pymilvus[milvus_lite,model]` marker across all Python versions, and
+    # tests that import MilvusRetriever need it on the path before the
+    # adapter's lazy import runs.
     "pymilvus[milvus_lite,model]>=2.4,<3",
+    "sentence-transformers>=2.0",
     "openai>=1.40,<2",
     "gradio>=5.0,<6",
     "python-dotenv>=1.0",

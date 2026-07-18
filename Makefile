@@ -1,7 +1,10 @@
-.PHONY: install test lint format typecheck all clean
+.PHONY: install uv-sync test lint format typecheck all clean
 
 install:
 	pip install -e ".[dev]"
+
+uv-sync:
+	uv sync --extra dev
 
 test:
 	pytest
