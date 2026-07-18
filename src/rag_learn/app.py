@@ -122,6 +122,13 @@ def build_app(
                 bot = panels[name]["bot"]
                 bot.value = bot.value + [{"role": "user", "content": q}]
 
+            # Known limitation: this handler batch-consumes each stream iterator
+            # via _drain_to_chatbot before updating the UI. The user sees nothing
+            # until BOTH sides complete. True per-token streaming (spec §5.2
+            # "threaded streams") would require converting on_submit to a generator
+            # that yields per-token updates via Gradio's response stream API.
+            # TODO: convert to incremental streaming once the demo UX matters.
+            # Tracked for the final-review follow-up list.
             # Per-side stream + chunk + perf updates.
             for name in retriever_names:
                 stream_iter, hits, perf_fn = outputs[name]
@@ -130,7 +137,7 @@ def build_app(
                     answer_text = _drain_to_chatbot(stream_iter)
                 except Exception as exc:  # noqa: BLE001 — spec §7 RetrievalError
                     logger.exception("retrieval / LLM stream failed for side=%s", name)
-                    panels[name]["bot"].value = [
+                    panels[name]["bot"].value = panels[name]["bot"].value + [
                         {"role": "assistant", "content": f"⚠ 检索失败：{exc}"}
                     ]
                     panels[name]["perf"].value = _format_perf(None)
