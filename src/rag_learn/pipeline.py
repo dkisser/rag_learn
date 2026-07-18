@@ -100,7 +100,6 @@ def answer_stream(
     retrieve_started = time.perf_counter()
     hits_by_side = _retrieve(retrievers, question, k)
     retrieve_ms = (time.perf_counter() - retrieve_started) * 1000.0
-    logger.info("answer_stream: retrieve_ms=%.2f sides=%d", retrieve_ms, len(hits_by_side))
 
     def _side(
         hits: list[Hit],
