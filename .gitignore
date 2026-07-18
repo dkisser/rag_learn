@@ -8,3 +8,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Project-local data and caches
+data/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.ruff_cache/
+.ty_cache/
