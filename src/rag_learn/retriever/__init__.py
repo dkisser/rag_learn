@@ -1,1 +1,3 @@
-# placeholder; populated in Task 3
+from rag_learn.retriever.base import BaseRetriever, Hit
+
+__all__ = ["BaseRetriever", "Hit"]
