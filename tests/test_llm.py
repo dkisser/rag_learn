@@ -56,6 +56,24 @@ class _RaisingClient:
     chat = _RaisingChat()
 
 
+class _RaisingStream:
+    def __iter__(self) -> Iterator[_FakeChunk]:
+        raise RuntimeError("stream interrupted")
+
+
+class _RaisingIterCompletions:
+    def create(self, **kwargs):
+        return _RaisingStream()
+
+
+class _RaisingIterChat:
+    completions = _RaisingIterCompletions()
+
+
+class _RaisingIterClient:
+    chat = _RaisingIterChat()
+
+
 def test_stream_yields_tokens_only_when_content_present():
     fake = _FakeClient(["你", "好", None, "世界"])
     llm = DeepSeekLLM(api_key="k", model="m", base_url="u", client=fake)  # type: ignore[arg-type]
@@ -88,3 +106,12 @@ def test_stream_emits_single_error_token_when_sdk_raises():
     tokens = list(llm.stream("sys", "user"))
     assert len(tokens) == 1
     assert "⚠ LLM 错误" in tokens[0] and "boom" in tokens[0]
+
+
+def test_stream_emits_interrupted_token_when_iteration_raises():
+    fake = _RaisingIterClient()
+    llm = DeepSeekLLM(api_key="k", model="m", base_url="u", client=fake)  # type: ignore[arg-type]
+    tokens = list(llm.stream("sys", "user"))
+    assert len(tokens) == 1
+    assert tokens[0].startswith("\n\n⚠ LLM 中断：")
+    assert "stream interrupted" in tokens[0]
