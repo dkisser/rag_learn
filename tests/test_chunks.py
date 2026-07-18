@@ -29,9 +29,11 @@ def test_chunk_length_respects_limit(monkeypatch):
     # reload is needed. (Reloading config.py here would invalidate class
     # identity for downstream tests like test_load_config_missing_api_key_raises.)
     chunks = load_documents(str(FIXTURES))
+    max_len = 200 + 20 + 2  # CHUNK_SIZE + CHUNK_OVERLAP + 1 for newline join
     for c in chunks:
-        # No padding applied, so chunks may be <= limit. None should exceed.
-        assert len(c.text) <= 300  # allow some slack around the boundary
+        assert len(c.text) <= max_len, (
+            f"chunk {c.source_file}#{c.chunk_index} is {len(c.text)} chars, exceeds bound {max_len}"
+        )
 
 
 def test_chunks_have_monotonic_index_per_file():
