@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import Iterator
 from typing import Any
 
@@ -213,7 +214,17 @@ def launch() -> None:
         raise SystemExit("两个 retriever 都没准备好，无法启动")
 
     app = build_app(retrievers=retrievers, llm=llm, config=config, warnings=warnings)
-    app.queue().launch(server_name="127.0.0.1", server_port=7860)
+    # Disable Gradio's analytics daemon: it spawns background threads that
+    # call uuid4()/os.urandom during startup. On macOS ARM with milvus-lite's
+    # gRPC server already holding threads + file descriptors from a fork,
+    # those concurrent os.urandom() calls segfault the interpreter before
+    # launch() can bind 127.0.0.1:7860. Gradio 5.50 has no launch() kwarg
+    # for this, so we set the env var it consults internally.
+    os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
+    app.queue().launch(
+        server_name="127.0.0.1",
+        server_port=7860,
+    )
 
 
 def _ts() -> str:

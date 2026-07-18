@@ -47,6 +47,21 @@ client object.
   `MilvusRetriever.ensure_indexed` calls `load_collection` after `insert+flush`
   (and defensively when the collection already exists from a prior run) so
   search() does not hit the "Collection in state released" RPC error.
+  - **macOS ARM caveat**: `load_collection` SIGSEGVs at the C layer on
+    `milvus-lite` 2.6+ when called outside the original insert+flush sequence
+    (e.g. on a reopened DB file). The retriever now skips the defensive call
+    when `sys.platform == "darwin"` and relies on pymilvus's implicit auto-load
+    at first `search()`. `tests/test_milvus_retriever.py::test_milvus_retriever_reloads_released_collection`
+    is decorated with `@darwin_milvus_reload_skip` (defined in
+    `tests/conftest.py`) for the same reason — Linux/Windows CI still covers
+    the cross-session reload contract.
+- **Gradio analytics crash on macOS.** Gradio 5.50 launches its analytics
+  daemon in background threads that call `uuid4()` → `os.urandom()`. Combined
+  with milvus-lite's gRPC fork handlers and the FD-poll-list leftovers, those
+  concurrent `os.urandom` calls SIGSEGV the interpreter on macOS ARM. `launch()`
+  sets `os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"` (Gradio 5.50 has no
+  launch() kwarg for this) so the analytics daemon never starts. Set
+  `GRADIO_ANALYTICS_ENABLED=True` if you need to re-enable it locally.
 - **Chunking changes need a fresh index.** Changing `CHUNK_SIZE` /
   `CHUNK_OVERLAP` (or any `loader.py` logic) requires `rm -rf data/` before the
   next launch — `ChromaRetriever.ensure_indexed` and

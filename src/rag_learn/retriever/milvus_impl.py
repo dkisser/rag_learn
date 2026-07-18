@@ -52,7 +52,20 @@ class MilvusRetriever:
             # finished loading after a failed insert during the known
             # deadlock window). Loading is idempotent and required before
             # search() can return hits.
-            self._client.load_collection(self._collection_name)
+            #
+            # macOS ARM + milvus-lite 2.6+ SIGSEGV inside load_collection
+            # (CLAUDE.md “milvus-lite deadlocks on the full 25-doc corpus”).
+            # The crash is at the C layer so a Python try/except cannot
+            # catch it. Skip the call on darwin and rely on pymilvus's
+            # implicit auto-load on first search() — search still works
+            # for collections that were loaded in this session (the common
+            # case after insert+flush), and degrades to the documented
+            # "released" error only on cross-session reload, which is the
+            # exact regression covered by test_milvus_retriever_reloads_released_collection
+            # (skipped on darwin in tests/conftest.py).
+            import sys as _sys
+            if _sys.platform != "darwin":
+                self._client.load_collection(self._collection_name)
             return
         chunks = load_documents(docs_dir)
         if not chunks:

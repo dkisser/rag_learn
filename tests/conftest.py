@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pytest
@@ -25,3 +26,10 @@ def sample_hits(fixtures_dir: Path) -> list[Hit]:
         )
         for c in chunks
     ]
+
+# milvus-lite 2.6+ on macOS ARM SIGSEGVs inside load_collection
+# (see CLAUDE.md “milvus-lite deadlocks on the full 25-doc corpus”).
+darwin_milvus_reload_skip = pytest.mark.skipif(
+    sys.platform == "darwin",
+    reason="milvus-lite load_collection SIGSEGVs on macOS ARM (CLAUDE.md)",
+)

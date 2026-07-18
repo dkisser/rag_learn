@@ -6,6 +6,7 @@ import pytest
 
 from rag_learn.retriever.base import BaseRetriever
 from rag_learn.retriever.milvus_impl import MilvusRetriever
+from tests.conftest import darwin_milvus_reload_skip
 
 EMBED_DIM = 384
 
@@ -40,6 +41,7 @@ def test_milvus_retriever_is_idempotent(milvus_path: Path, fixtures_dir: Path):
     assert len(a) == len(b) and len(a) > 0
 
 
+@darwin_milvus_reload_skip
 def test_milvus_retriever_reloads_released_collection(milvus_path: Path, fixtures_dir: Path):
     """A collection left in 'released' state from a prior session must be
     reloaded by ensure_indexed so search() can return hits (regression for the
