@@ -5,10 +5,14 @@ description = "RAG comparison demo: Chroma vs Milvus Lite over 25 RAG markdown d
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "chromadb>=0.5",
-    "pymilvus>=2.4",
-    "openai>=1.40",
-    "gradio>=5.0",
+    # Pin upper bounds to the major versions the implementation plan was
+    # written against. Latest majors have changed APIs (chromadb 1.x,
+    # pymilvus 3.x, openai 2.x, gradio 6.x) that would silently break the
+    # plan code blocks. Bumping is a separate, deliberate effort.
+    "chromadb>=0.5,<1",
+    "pymilvus>=2.4,<3",
+    "openai>=1.40,<2",
+    "gradio>=5.0,<6",
     "python-dotenv>=1.0",
 ]
 
