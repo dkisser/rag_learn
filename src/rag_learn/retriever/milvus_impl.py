@@ -47,6 +47,12 @@ class MilvusRetriever:
 
     def ensure_indexed(self, docs_dir: str) -> None:
         if self._collection_exists():
+            # A collection from a previous run may be in 'released' state
+            # (e.g. milvus-lite released it after a prior search, or it never
+            # finished loading after a failed insert during the known
+            # deadlock window). Loading is idempotent and required before
+            # search() can return hits.
+            self._client.load_collection(self._collection_name)
             return
         chunks = load_documents(docs_dir)
         if not chunks:
@@ -71,6 +77,7 @@ class MilvusRetriever:
             )
         self._client.insert(collection_name=self._collection_name, data=rows)
         self._client.flush(self._collection_name)
+        self._client.load_collection(self._collection_name)
         logger.info("Milvus indexed %d chunks into %s", len(rows), self._collection_name)
 
     def search(self, query: str, k: int = 5) -> list[Hit]:

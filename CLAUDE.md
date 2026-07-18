@@ -44,6 +44,9 @@ client object.
   exercises Chroma only with the mocked LLM. Milvus coverage lives in
   `tests/test_milvus_retriever.py` against the small fixture. If you need
   real-doc Milvus e2e, downgrade `milvus-lite` or run a Milvus standalone server.
+  `MilvusRetriever.ensure_indexed` calls `load_collection` after `insert+flush`
+  (and defensively when the collection already exists from a prior run) so
+  search() does not hit the "Collection in state released" RPC error.
 - **Chunking changes need a fresh index.** Changing `CHUNK_SIZE` /
   `CHUNK_OVERLAP` (or any `loader.py` logic) requires `rm -rf data/` before the
   next launch — `ChromaRetriever.ensure_indexed` and

@@ -1,6 +1,7 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
+
 from rag_learn.retriever.base import BaseRetriever, Hit
 
 

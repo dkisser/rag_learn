@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from rag_learn.retriever.chroma_impl import ChromaRetriever
 
 from rag_learn.retriever.base import BaseRetriever
+from rag_learn.retriever.chroma_impl import ChromaRetriever
 
 
 @pytest.fixture
