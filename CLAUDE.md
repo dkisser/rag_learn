@@ -49,12 +49,19 @@ client object.
   search() does not hit the "Collection in state released" RPC error.
   - **macOS ARM caveat**: `load_collection` SIGSEGVs at the C layer on
     `milvus-lite` 2.6+ when called outside the original insert+flush sequence
-    (e.g. on a reopened DB file). The retriever now skips the defensive call
-    when `sys.platform == "darwin"` and relies on pymilvus's implicit auto-load
-    at first `search()`. `tests/test_milvus_retriever.py::test_milvus_retriever_reloads_released_collection`
-    is decorated with `@darwin_milvus_reload_skip` (defined in
-    `tests/conftest.py`) for the same reason — Linux/Windows CI still covers
-    the cross-session reload contract.
+    (e.g. on a reopened DB file). The retriever runs the defensive call in a
+    subprocess (`_safe_load_collection` in `src/rag_learn/retriever/milvus_impl.py`)
+    via `multiprocessing.get_context("spawn")` so a SIGSEGV only kills the
+    subprocess; if the subprocess fails, `ensure_indexed` drops the collection
+    and recreates it from the source docs. There is still a residual risk that
+    the recreate path itself SIGSEGVs on the full 25-doc corpus — if so, the
+    documented escape hatches are `make clean`, downgrade `milvus-lite`, or
+    run a Milvus standalone server.
+  - **Cross-session reload contract**: pymilvus 2.6+ `MilvusClient.search()`
+    does **not** auto-load collections; without the defensive call every
+    restart of the app against an existing `data/milvus.db` hits
+    `Collection in state released` on the first `search()`. The subprocess
+    wrapper handles this on darwin and runs directly on Linux/Windows.
 - **Gradio analytics crash on macOS.** Gradio 5.50 launches its analytics
   daemon in background threads that call `uuid4()` → `os.urandom()`. Combined
   with milvus-lite's gRPC fork handlers and the FD-poll-list leftovers, those

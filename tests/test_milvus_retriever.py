@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import os
+import signal
+import time
 from pathlib import Path
 
 import pytest
 
 from rag_learn.retriever.base import BaseRetriever
-from rag_learn.retriever.milvus_impl import MilvusRetriever
-from tests.conftest import darwin_milvus_reload_skip
+from rag_learn.retriever.milvus_impl import (
+    MilvusRetriever,
+    _run_isolated,
+)
 
 EMBED_DIM = 384
 
@@ -14,6 +19,51 @@ EMBED_DIM = 384
 @pytest.fixture
 def milvus_path(tmp_path: Path) -> Path:
     return tmp_path / "milvus.db"
+
+
+# ---------------------------------------------------------------------------
+# Subprocess targets for _run_isolated tests. Module-level so multiprocessing
+# 'spawn' can pickle them on macOS.
+# ---------------------------------------------------------------------------
+
+
+def _target_returns_cleanly(*_args, **_kwargs) -> None:
+    """Returns normally → exit code 0 → _run_isolated should return True."""
+
+
+def _target_raises(*_args, **_kwargs) -> None:
+    raise RuntimeError("boom from subprocess")
+
+
+def _target_sleeps(seconds: float, *_args, **_kwargs) -> None:
+    time.sleep(seconds)
+
+
+def _target_kills_self_with_sigsegv(*_args, **_kwargs) -> None:
+    """The exact regression mode for milvus-lite 2.6+ on macOS ARM:
+    a C-level SIGSEGV inside the subprocess."""
+    os.kill(os.getpid(), signal.SIGSEGV)
+
+
+class TestRunIsolated:
+    """The subprocess wrapper exists so a milvus-lite C-level crash doesn't
+    bring down the host Python interpreter. These tests pin down the four
+    exit-shape branches: clean exit, exception, timeout, signal kill."""
+
+    def test_returns_true_when_subprocess_exits_cleanly(self):
+        assert _run_isolated(_target_returns_cleanly, timeout=5.0) is True
+
+    def test_returns_false_when_subprocess_raises_exception(self):
+        assert _run_isolated(_target_raises, timeout=5.0) is False
+
+    def test_returns_false_when_subprocess_exceeds_timeout(self):
+        # Sleep for 10s but give 0.2s — wrapper must terminate and return False.
+        assert _run_isolated(_target_sleeps, 10.0, timeout=0.2) is False
+
+    def test_returns_false_when_subprocess_is_killed_by_sigsegv(self):
+        # The case the wrapper was built for: a C-level SIGSEGV (milvus-lite
+        # on macOS ARM) only kills the subprocess, not the test runner.
+        assert _run_isolated(_target_kills_self_with_sigsegv, timeout=5.0) is False
 
 
 def test_milvus_retriever_ensure_indexed_then_search(milvus_path: Path, fixtures_dir: Path):
@@ -41,7 +91,6 @@ def test_milvus_retriever_is_idempotent(milvus_path: Path, fixtures_dir: Path):
     assert len(a) == len(b) and len(a) > 0
 
 
-@darwin_milvus_reload_skip
 def test_milvus_retriever_reloads_released_collection(milvus_path: Path, fixtures_dir: Path):
     """A collection left in 'released' state from a prior session must be
     reloaded by ensure_indexed so search() can return hits (regression for the
