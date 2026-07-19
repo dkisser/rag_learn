@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from rag_learn.app import build_app
+from types import SimpleNamespace
+
+from rag_learn.app import (
+    _flatten_output_targets,
+    _flatten_output_values,
+    build_app,
+)
 from rag_learn.config import Config
 from rag_learn.llm import DeepSeekLLM
 from rag_learn.retriever.chroma_impl import ChromaRetriever
@@ -59,3 +65,61 @@ def test_build_app_with_warnings_constructs(tmp_path, monkeypatch):
         warnings=[("chroma", "model download failed")],
     )
     assert app is not None
+
+
+# ---------------------------------------------------------------------------
+# _flatten_output_targets / _flatten_output_values
+#
+# The bug: submit.click(..., outputs=[]) made Gradio drop every per-component
+# .value mutation from on_submit, so the UI never updated. These helpers
+# pin down the contract that on_submit returns exactly the values for the
+# declared output targets.
+# ---------------------------------------------------------------------------
+
+
+def test_flatten_output_targets_chroma_only_has_four_components():
+    panels = {"chroma": {"bot": "b", "chunks": "c", "perf": "p"}}
+    assert _flatten_output_targets("q", panels, ["chroma"]) == ["q", "b", "c", "p"]
+
+
+def test_flatten_output_targets_two_retrievers_seven_components():
+    panels = {
+        "chroma": {"bot": "b1", "chunks": "c1", "perf": "p1"},
+        "milvus": {"bot": "b2", "chunks": "c2", "perf": "p2"},
+    }
+    assert _flatten_output_targets("q", panels, ["chroma", "milvus"]) == [
+        "q",
+        "b1",
+        "c1",
+        "p1",
+        "b2",
+        "c2",
+        "p2",
+    ]
+
+
+def test_flatten_output_values_matches_targets_in_order():
+    panels = {
+        "chroma": {
+            "bot": SimpleNamespace(value=[{"role": "assistant", "content": "hi"}]),
+            "chunks": SimpleNamespace(value="**chunks**"),
+            "perf": SimpleNamespace(value="42ms"),
+        },
+    }
+    assert _flatten_output_values("", panels, ["chroma"]) == [
+        "",
+        [{"role": "assistant", "content": "hi"}],
+        "**chunks**",
+        "42ms",
+    ]
+
+
+def test_flatten_output_values_clear_question_with_empty_string():
+    panels = {
+        "chroma": {
+            "bot": SimpleNamespace(value=[]),
+            "chunks": SimpleNamespace(value=""),
+            "perf": SimpleNamespace(value=""),
+        }
+    }
+    assert _flatten_output_values("", panels, ["chroma"])[0] == ""

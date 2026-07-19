@@ -45,6 +45,50 @@ def _drain_to_chatbot(stream: Iterator[str]) -> str:
     return "".join(list(stream)) or "_（无输出）_"
 
 
+def _flatten_output_targets(
+    question: Any,
+    panels: dict[str, dict[str, Any]],
+    retriever_names: list[str],
+) -> list[Any]:
+    """Flat list of components that on_submit must return values for, in order.
+
+    Order: question first (so it clears on submit), then per-retriever
+    (bot, chunks, perf). Mirrors _flatten_output_values.
+
+    A previous version declared `outputs=[]` on submit.click and relied on
+    direct .value mutation. Gradio only re-renders declared outputs, so
+    those mutations never reached the UI — submit appeared to do nothing.
+    """
+    targets: list[Any] = [question]
+    for name in retriever_names:
+        targets.extend(
+            [
+                panels[name]["bot"],
+                panels[name]["chunks"],
+                panels[name]["perf"],
+            ]
+        )
+    return targets
+
+
+def _flatten_output_values(
+    question_value: str,
+    panels: dict[str, dict[str, Any]],
+    retriever_names: list[str],
+) -> list[Any]:
+    """Parallel to _flatten_output_targets: current .value of each component."""
+    values: list[Any] = [question_value]
+    for name in retriever_names:
+        values.extend(
+            [
+                panels[name]["bot"].value,
+                panels[name]["chunks"].value,
+                panels[name]["perf"].value,
+            ]
+        )
+    return values
+
+
 def build_app(
     retrievers: dict[str, BaseRetriever],
     llm: Any,
@@ -104,9 +148,9 @@ def build_app(
                         "perf": perf_md,
                     }
 
-        def on_submit(q: str) -> dict[str, Any]:
+        def on_submit(q: str) -> list[Any]:
             if not q.strip():
-                return gr.update()  # no-op
+                return _flatten_output_values("", panels, retriever_names)
             try:
                 outputs = answer_stream(retrievers, llm, q, k=config.retrieve_k)
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
@@ -116,7 +160,7 @@ def build_app(
                 panels[first]["bot"].value = [
                     {"role": "assistant", "content": f"⚠ 流水线失败：{exc}"}
                 ]
-                return gr.update()
+                return _flatten_output_values("", panels, retriever_names)
 
             # Display user question in each chatbot as history seed.
             for name in retriever_names:
@@ -156,9 +200,10 @@ def build_app(
                 bot.value = bot.value + [{"role": "assistant", "content": answer_text}]
                 panels[name]["perf"].value = _format_perf(perf)
 
-            return gr.update()
+            return _flatten_output_values("", panels, retriever_names)
 
-        submit.click(on_submit, inputs=[question], outputs=[])
+        click_outputs = _flatten_output_targets(question, panels, retriever_names)
+        submit.click(on_submit, inputs=[question], outputs=click_outputs)
 
         def on_clear():
             for name in retriever_names:
@@ -177,7 +222,6 @@ def launch() -> None:
     from rag_learn.config import ConfigError, load_config
     from rag_learn.llm import DeepSeekLLM
     from rag_learn.retriever.chroma_impl import ChromaRetriever
-    from rag_learn.retriever.milvus_impl import MilvusRetriever
 
     try:
         config = load_config()
@@ -199,7 +243,7 @@ def launch() -> None:
     # Per-retriever ingestion is fail-open (see spec §5.5).
     for name, factory in [
         ("chroma", lambda: ChromaRetriever(persist_dir=config.chroma_dir)),
-        ("milvus", lambda: MilvusRetriever(db_path=config.milvus_path, dim=384)),
+        # ("milvus", lambda: MilvusRetriever(db_path=config.milvus_path, dim=384)),
     ]:
         try:
             r = factory()
