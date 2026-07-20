@@ -13,6 +13,7 @@ from rag_learn.config import Config
 from rag_learn.pipeline import StreamPerf, answer_stream
 from rag_learn.retriever import Hit
 from rag_learn.retriever.base import BaseRetriever
+# from rag_learn.retriever.milvus_impl import MilvusRetriever
 
 logger = logging.getLogger(__name__)
 
