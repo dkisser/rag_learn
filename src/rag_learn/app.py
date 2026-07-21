@@ -1,4 +1,4 @@
-"""Gradio UI: side-by-side streams with per-side chunks panels + perf metrics."""
+"""Gradio UI: collection dropdown + single answer panel with chunks and perf metrics."""
 
 from __future__ import annotations
 
@@ -57,7 +57,15 @@ def build_app(
     config: Config,
     warnings: list[tuple[str, str]] | None = None,
 ) -> gr.Blocks:
-    """Construct the Gradio UI but do not launch it."""
+    """Construct the Gradio UI but do not launch it.
+
+    Args:
+        catalog: The collection catalog to render in the dropdown.
+        llm: LLM instance compatible with answer_stream.
+        config: Application config for display metadata.
+        warnings: Optional list of (collection_name, error_message) for
+            collections that failed ingest during startup.
+    """
     choices = catalog.display_choices()
     default_slug = choices[0][1] if choices else None
 
@@ -84,6 +92,8 @@ def build_app(
                 lines=2,
                 scale=3,
             )
+        desc_md = gr.Markdown()
+
         with gr.Row():
             submit = gr.Button("发送", variant="primary")
             clear = gr.Button("清空")
@@ -99,6 +109,7 @@ def build_app(
         def on_submit(collection_slug: str, q: str) -> list[Any]:
             empty_outputs: list[Any] = [
                 gr.update(value=""),
+                "",
                 [],
                 "_（无召回）_",
                 _format_perf(None),
@@ -110,7 +121,13 @@ def build_app(
             except CollectionNotFoundError:
                 logger.warning("Unknown collection slug: %r", collection_slug)
                 bot.value = [{"role": "assistant", "content": f"⚠ 未知集合：{collection_slug}"}]
-                return [gr.update(value=""), bot.value, "_（无召回）_", _format_perf(None)]
+                return [
+                    gr.update(value=""),
+                    "",
+                    bot.value,
+                    "_（无召回）_",
+                    _format_perf(None),
+                ]
 
             retriever = collection.retriever
             try:
@@ -123,7 +140,13 @@ def build_app(
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
                 bot.value = [{"role": "assistant", "content": f"⚠ 流水线失败：{exc}"}]
-                return [gr.update(value=""), bot.value, "_（无召回）_", _format_perf(None)]
+                return [
+                    gr.update(value=""),
+                    collection.description,
+                    bot.value,
+                    "_（无召回）_",
+                    _format_perf(None),
+                ]
 
             bot.value = bot.value + [{"role": "user", "content": q}]
             stream_iter, hits, perf_fn = outputs[collection_slug]
@@ -134,7 +157,13 @@ def build_app(
                 logger.exception("retrieval / LLM stream failed for side=%s", collection_slug)
                 bot.value = bot.value + [{"role": "assistant", "content": f"⚠ 检索失败：{exc}"}]
                 perf_md.value = _format_perf(None)
-                return [gr.update(value=""), bot.value, chunks_md.value, perf_md.value]
+                return [
+                    gr.update(value=""),
+                    collection.description,
+                    bot.value,
+                    chunks_md.value,
+                    perf_md.value,
+                ]
 
             perf = perf_fn()
             logger.info(
@@ -147,18 +176,25 @@ def build_app(
             )
             bot.value = bot.value + [{"role": "assistant", "content": answer_text}]
             perf_md.value = _format_perf(perf)
-            return [gr.update(value=""), bot.value, chunks_md.value, perf_md.value]
+            return [
+                gr.update(value=""),
+                collection.description,
+                bot.value,
+                chunks_md.value,
+                perf_md.value,
+            ]
 
         submit.click(
             on_submit,
             inputs=[collection_dd, question],
-            outputs=[question, bot, chunks_md, perf_md],
+            outputs=[question, desc_md, bot, chunks_md, perf_md],
         )
 
         def on_clear() -> Any:
             bot.value = []
             chunks_md.value = "_提交问题后展示_"
             perf_md.value = _format_perf(None)
+            desc_md.value = ""
             return gr.update(value="")
 
         clear.click(on_clear, inputs=[], outputs=[question])
@@ -185,11 +221,16 @@ def launch() -> None:
     )
 
     catalog = build_catalog()
+    logger.info("Catalog: %d collections %s", len(catalog.collections), catalog.names())
     raw_warnings = catalog.ensure_all_indexed()
+    failed_names = {name for name, _ in raw_warnings}
+    for c in catalog.collections:
+        if c.name not in failed_names:
+            logger.info("Collection ready: %s", c.name)
+    for name, msg in raw_warnings:
+        logger.warning("Collection ingest failed: %s - %s", name, msg)
     working = Catalog(
-        collections=tuple(
-            c for c in catalog.collections if c.name not in {name for name, _ in raw_warnings}
-        )
+        collections=tuple(c for c in catalog.collections if c.name not in failed_names)
     )
     if not working.names():
         raise SystemExit("所有 collection ingest 失败，无法启动")
@@ -233,7 +274,14 @@ def _migrate_legacy_chroma(config: Config) -> None:
         return
 
     target.mkdir(parents=True, exist_ok=True)
-    for src in legacy:
-        shutil.move(str(src), str(target / src.name))
-    marker.write_text("migrated\n", encoding="utf-8")
-    logger.info("Migrated legacy Chroma data: %d entries -> %s", len(legacy), target)
+    try:
+        for src in legacy:
+            shutil.move(str(src), str(target / src.name))
+        marker.write_text("migrated\n", encoding="utf-8")
+        logger.info("Migrated legacy Chroma data: %d entries -> %s", len(legacy), target)
+    except Exception as exc:  # noqa: BLE001 — migration failure is fail-open per spec §7
+        logger.warning("Legacy Chroma migration failed: %s; continuing startup", exc)
+        try:
+            marker.write_text("failed\n", encoding="utf-8")
+        except Exception:  # noqa: BLE001 — best-effort marker to avoid retry
+            pass

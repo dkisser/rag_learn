@@ -113,7 +113,7 @@ def test_collection_is_frozen(fake_docs: Path):
 # ---- Catalog ----
 
 
-def _make_collection(name: str, display: str, docs_dir: Path):
+def _make_collection(name: str, display: str, docs_dir: Path) -> Collection:
     return Collection(
         name=name,
         display_name=display,

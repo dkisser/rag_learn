@@ -13,6 +13,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# docs_dir is expected to sit at <repo-root>/docs/<collection-name>.
+# Chroma persist directories therefore live at <repo-root>/data/chroma/<collection-name>.
+PERSIST_DIR_SEGMENTS = ("data", "chroma")
+
 
 def _default_factory(persist_dir: Path, name: str) -> BaseRetriever:
     # Imported lazily so this module stays cheap when only Collection is used.
@@ -54,7 +58,12 @@ class Collection:
     @property
     def retriever(self) -> BaseRetriever:
         if self._retriever is None:
-            persist_dir = self.docs_dir.parent.parent / "data" / "chroma" / self.name
+            persist_dir = (
+                self.docs_dir.parent.parent
+                / PERSIST_DIR_SEGMENTS[0]
+                / PERSIST_DIR_SEGMENTS[1]
+                / self.name
+            )
             retriever = self.retriever_factory(persist_dir, self.name)
             retriever.ensure_indexed(str(self.docs_dir))
             object.__setattr__(self, "_retriever", retriever)

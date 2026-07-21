@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import gradio as gr
 import pytest
@@ -87,6 +89,24 @@ def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path) -> None:
     assert not (config.chroma_dir / ".migrated").exists()
 
 
+def test_migrate_fail_open_on_io_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """I/O failure during migration must not crash startup."""
+    config = _make_config(tmp_path)
+    config.chroma_dir.mkdir(parents=True)
+    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
+
+    def _boom(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr("rag_learn.app.shutil.move", _boom)
+
+    _migrate_legacy_chroma(config)
+
+    # Marker should be written so the failing migration isn't retried every launch.
+    assert (config.chroma_dir / ".migrated").exists()
+    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched after failure
+
+
 # ---- build_app(catalog=...) ----
 
 
@@ -139,11 +159,11 @@ def stub_catalog(tmp_path: Path) -> Catalog:
     )
 
 
-def _stub_llm():
+def _stub_llm() -> Any:
     """Fake DeepSeekLLM whose .stream yields a single token."""
 
     class _StubLLM:
-        def stream(self, system: str, user: str):
+        def stream(self, system: str, user: str) -> Iterator[str]:
             yield "ok"
 
     return _StubLLM()

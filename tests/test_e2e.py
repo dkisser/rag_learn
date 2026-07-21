@@ -8,6 +8,7 @@ calling DeepSeek.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +36,7 @@ class _FakeStream:
     def __init__(self) -> None:
         self.calls = 0
 
-    def __call__(self, system: str, user: str):
+    def __call__(self, system: str, user: str) -> Iterator[_FakeChunk]:
         # Yield an OpenAI-shaped chunk so DeepSeekLLM.stream can decode it.
         self.calls += 1
         yield _FakeChunk("TEST ANSWER")
@@ -81,7 +82,7 @@ def _stub_llm() -> Any:
     """Fake DeepSeekLLM whose .stream yields a single token."""
 
     class _StubLLM:
-        def stream(self, system: str, user: str) -> str:
+        def stream(self, system: str, user: str) -> Iterator[str]:
             yield "ok"
 
     return _StubLLM()
@@ -172,8 +173,34 @@ def test_e2e_build_app_collection_selection_changes_chunks(tmp_path: Path):
     submit_fn = app.fns[0].fn
     for slug in ("aaa", "bbb"):
         outputs = submit_fn(slug, f"question for {slug}")
-        assert isinstance(outputs, list) and len(outputs) == 4
-        chunks_md = outputs[2]
+        assert isinstance(outputs, list) and len(outputs) == 5
+        chunks_md = outputs[3]
         assert f"{slug}.md" in str(chunks_md), (
             f"selection {slug!r} should drive retrieval from that collection"
         )
+
+
+def test_e2e_build_app_empty_question_clears_output(tmp_path: Path):
+    """Submitting an empty question returns empty outputs without raising."""
+    catalog = _two_collection_catalog(tmp_path)
+    config = _make_config(tmp_path)
+    app = build_app(catalog=catalog, llm=_stub_llm(), config=config)
+
+    submit_fn = app.fns[0].fn
+    outputs = submit_fn("aaa", "   ")
+    assert isinstance(outputs, list) and len(outputs) == 5
+    assert outputs[1] == ""  # desc_md cleared
+    assert outputs[2] == []  # bot empty
+
+
+def test_e2e_build_app_unknown_collection_shows_warning(tmp_path: Path):
+    """An unknown collection slug shows a warning and leaves chunks empty."""
+    catalog = _two_collection_catalog(tmp_path)
+    config = _make_config(tmp_path)
+    app = build_app(catalog=catalog, llm=_stub_llm(), config=config)
+
+    submit_fn = app.fns[0].fn
+    outputs = submit_fn("no-such-slug", "hello")
+    assert isinstance(outputs, list) and len(outputs) == 5
+    assert "未知集合" in str(outputs[2])  # bot warning
+    assert outputs[3] == "_（无召回）_"  # chunks empty
