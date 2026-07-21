@@ -12,11 +12,11 @@ from typing import Any
 
 import gradio as gr
 
-from rag_learn.collections import Catalog, CollectionNotFoundError
-from rag_learn.config import Config
+from rag_learn.collections import Catalog, CollectionNotFoundError, build_catalog
+from rag_learn.config import Config, ConfigError, load_config
+from rag_learn.llm import DeepSeekLLM
 from rag_learn.pipeline import StreamPerf, answer_stream
 from rag_learn.retriever import Hit
-from rag_learn.retriever.base import BaseRetriever
 
 # from rag_learn.retriever.milvus_impl import MilvusRetriever
 
@@ -167,10 +167,7 @@ def build_app(
 
 
 def launch() -> None:
-    """Production entry: load config, build real retrievers + LLM, ingest, serve."""
-    from rag_learn.config import ConfigError, load_config
-    from rag_learn.llm import DeepSeekLLM
-    from rag_learn.retriever.chroma_impl import ChromaRetriever
+    """Production entry: load config, build catalog + LLM, migrate, ingest, serve."""
 
     try:
         config = load_config()
@@ -179,6 +176,7 @@ def launch() -> None:
 
     config.data_dir.mkdir(parents=True, exist_ok=True)
     config.chroma_dir.mkdir(parents=True, exist_ok=True)
+    _migrate_legacy_chroma(config)
 
     llm = DeepSeekLLM(
         api_key=config.deepseek_api_key,
@@ -186,44 +184,25 @@ def launch() -> None:
         base_url=config.deepseek_base_url,
     )
 
-    retrievers: dict[str, BaseRetriever] = {}
-    warnings: list[tuple[str, str]] = []
-
-    # Per-retriever ingestion is fail-open (see spec §5.5).
-    for name, factory in [
-        ("chroma", lambda: ChromaRetriever(persist_dir=config.chroma_dir)),
-        # ("milvus", lambda: MilvusRetriever(db_path=config.milvus_path, dim=384)),
-    ]:
-        try:
-            r = factory()
-            r.ensure_indexed(str(config.docs_dir))
-            retrievers[name] = r
-            logger.info("[%s] %s ready", _ts(), name)
-        except Exception as exc:  # noqa: BLE001
-            logger.exception("[%s] %s ingestion failed: %s", _ts(), name, exc)
-            warnings.append((name, str(exc)))
-
-    if not retrievers:
-        raise SystemExit("两个 retriever 都没准备好，无法启动")
-
-    app = build_app(retrievers=retrievers, llm=llm, config=config, warnings=warnings)
-    # Disable Gradio's analytics daemon: it spawns background threads that
-    # call uuid4()/os.urandom during startup. On macOS ARM with milvus-lite's
-    # gRPC server already holding threads + file descriptors from a fork,
-    # those concurrent os.urandom() calls segfault the interpreter before
-    # launch() can bind 127.0.0.1:7860. Gradio 5.50 has no launch() kwarg
-    # for this, so we set the env var it consults internally.
-    os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
-    app.queue().launch(
-        server_name="127.0.0.1",
-        server_port=7860,
+    catalog = build_catalog()
+    raw_warnings = catalog.ensure_all_indexed()
+    working = Catalog(
+        collections=tuple(
+            c for c in catalog.collections if c.name not in {name for name, _ in raw_warnings}
+        )
     )
+    if not working.names():
+        raise SystemExit("所有 collection ingest 失败，无法启动")
 
-
-def _ts() -> str:
-    import time
-
-    return time.strftime("%H:%M:%S") + f".{int((time.time() % 1) * 1000):03d}"
+    app = build_app(
+        catalog=working,
+        llm=llm,
+        config=config,
+        warnings=raw_warnings,
+    )
+    # Disable Gradio's analytics daemon — see CLAUDE.md macOS ARM note.
+    os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
+    app.queue().launch(server_name="127.0.0.1", server_port=7860)
 
 
 # ---- Legacy migration ----

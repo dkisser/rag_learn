@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import gradio as gr
 import pytest
 
 from rag_learn.app import _migrate_legacy_chroma, build_app
 from rag_learn.collections import Catalog, Collection
 from rag_learn.config import Config
-from rag_learn.retriever.base import Hit
+from rag_learn.retriever.base import BaseRetriever, Hit
 
 
 def _make_config(tmp_path: Path) -> Config:
@@ -172,3 +173,105 @@ def test_build_app_warns_on_failed_collections(stub_catalog: Catalog, tmp_path: 
     assert "启动期集合 ingest 失败" in rendered
     assert "aaa" in rendered
     assert "boom" in rendered
+
+
+# ---- launch() behavior (no real Gradio launch) ----
+
+
+def test_launch_filters_failed_collections(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    """If one collection's retriever factory raises, build_app must not see it."""
+    from rag_learn import app as app_module
+
+    good_dir = tmp_path / "docs_good"
+    good_dir.mkdir()
+    (good_dir / "x.md").write_text("# X\n\nhi")
+
+    def boom_factory(persist_dir: Path, name: str) -> BaseRetriever:
+        raise RuntimeError("boom")
+
+    good = Collection(
+        name="good",
+        display_name="好集",
+        docs_dir=good_dir,
+        retriever_factory=lambda d, n: StubRetriever(d, n),
+    )
+    bad = Collection(
+        name="bad",
+        display_name="坏集",
+        docs_dir=good_dir,  # re-use; factory never gets there
+        retriever_factory=boom_factory,
+    )
+    catalog = Catalog(collections=(good, bad))
+
+    # Stub out Gradio launch so this test doesn't bind a port.
+    launched = {"called": False}
+
+    def fake_launch(self, *args, **kwargs):
+        launched["called"] = True
+
+    monkeypatch.setattr(gr.Blocks, "launch", fake_launch)
+    monkeypatch.setattr(gr.Blocks, "queue", lambda self: self)
+
+    # Stub the LLM and config so launch() doesn't hit the network or read .env.
+    fake_llm = _stub_llm()
+
+    config = _make_config(tmp_path)
+    config.data_dir.mkdir(parents=True, exist_ok=True)
+    config.chroma_dir.mkdir(parents=True, exist_ok=True)
+
+    built = {}
+
+    def fake_build_app(catalog, llm, config, warnings=None):  # type: ignore[no-untyped-def]
+        built["catalog_names"] = catalog.names()
+        built["warnings"] = warnings or []
+        return gr.Blocks()  # empty Blocks is fine for this test
+
+    monkeypatch.setattr(app_module, "build_app", fake_build_app)
+    monkeypatch.setattr(app_module, "load_config", lambda: config)
+    monkeypatch.setattr(app_module, "DeepSeekLLM", lambda **_kw: fake_llm)
+    monkeypatch.setattr(app_module, "build_catalog", lambda: catalog)
+
+    app_module.launch()
+
+    assert launched["called"], "Gradio launch() should have been called"
+    assert built["catalog_names"] == ["good"], "failed collection must be filtered out"
+    assert len(built["warnings"]) == 1
+    assert built["warnings"][0][0] == "bad"
+
+
+def test_launch_exits_when_all_collections_fail(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    from rag_learn import app as app_module
+
+    def boom_factory(persist_dir: Path, name: str) -> BaseRetriever:
+        raise RuntimeError("boom")
+
+    good_dir = tmp_path / "docs"
+    good_dir.mkdir()
+    (good_dir / "x.md").write_text("# X\n\nhi")
+    catalog = Catalog(
+        collections=(
+            Collection(
+                name="bad1",
+                display_name="坏1",
+                docs_dir=good_dir,
+                retriever_factory=boom_factory,
+            ),
+            Collection(
+                name="bad2",
+                display_name="坏2",
+                docs_dir=good_dir,
+                retriever_factory=boom_factory,
+            ),
+        )
+    )
+
+    config = _make_config(tmp_path)
+    config.data_dir.mkdir(parents=True, exist_ok=True)
+    config.chroma_dir.mkdir(parents=True, exist_ok=True)
+
+    monkeypatch.setattr(app_module, "load_config", lambda: config)
+    monkeypatch.setattr(app_module, "DeepSeekLLM", lambda **_kw: _stub_llm())
+    monkeypatch.setattr(app_module, "build_catalog", lambda: catalog)
+
+    with pytest.raises(SystemExit, match="所有 collection ingest 失败"):
+        app_module.launch()
