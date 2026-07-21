@@ -1,29 +1,21 @@
-"""End-to-end smoke: real 25 markdown docs go through the Chroma pipeline with a mocked LLM.
+"""End-to-end smoke: multi-collection catalog flows through the pipeline with a mocked LLM.
 
-Exercises the full pipeline (load_config → ChromaRetriever →
+Exercises the full pipeline (load_config → Catalog → StubRetriever →
 answer_stream → DeepSeekLLM). The LLM is replaced with a fake that yields one
 OpenAI-shaped chunk so we can assert the streaming contract end-to-end without
 calling DeepSeek.
-
-NOTE: The brief specified exercising MilvusRetriever in parallel with Chroma,
-but the in-tree Milvus adapter (milvus-lite 3.1.0 + pymilvus 2.6.17) hangs on
-all subsequent gRPC calls after a 433-row insert — search(), has_collection(),
-release_collection(), even load_collection() all deadlock. Verified locally
-with minimal repro (see Task 12 report). Milvus coverage is already exercised
-end-to-end by tests/test_milvus_retriever.py against the small fixture; the
-real-25-docs path is exercised here via Chroma only.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from rag_learn.config import load_config
+from rag_learn.app import build_app
+from rag_learn.collections import Catalog, Collection
+from rag_learn.config import Config, load_config
 from rag_learn.llm import DeepSeekLLM
 from rag_learn.pipeline import answer_stream
-from rag_learn.retriever.chroma_impl import ChromaRetriever
-
-DOCS_DIR = Path(__file__).resolve().parents[1] / "docs" / "rag_doc"
+from rag_learn.retriever.base import Hit
 
 
 class _FakeChoice:
@@ -48,16 +40,83 @@ class _FakeStream:
         yield _FakeChunk("TEST ANSWER")
 
 
+class _AltStub:
+    """Returns collection-specific hits so we can prove selection matters."""
+
+    def __init__(self, persist_dir: Path, collection_name: str) -> None:
+        self.collection_name = collection_name
+
+    def ensure_indexed(self, docs_dir: str) -> None:
+        pass
+
+    def search(self, query: str, k: int = 5) -> list[Hit]:
+        return [
+            Hit(
+                text=f"hit-from-{self.collection_name}-for-{query}",
+                source_file=f"{self.collection_name}.md",
+                chunk_index=0,
+                score=0.0,
+            )
+        ]
+
+
+def _make_config(tmp_path: Path) -> Config:
+    return Config(
+        deepseek_api_key="dummy",
+        llm_model="dummy",
+        deepseek_base_url="https://example.invalid",
+        retrieve_k=5,
+        chunk_size=800,
+        chunk_overlap=50,
+        repo_root=tmp_path,
+        docs_dir=tmp_path / "docs",
+        data_dir=tmp_path / "data",
+        chroma_dir=tmp_path / "data" / "chroma",
+        milvus_path=tmp_path / "data" / "milvus.db",
+    )
+
+
+def _stub_llm():
+    """Fake DeepSeekLLM whose .stream yields a single token."""
+
+    class _StubLLM:
+        def stream(self, system: str, user: str):
+            yield "ok"
+
+    return _StubLLM()
+
+
+def _two_collection_catalog(tmp_path: Path) -> Catalog:
+    docs_a = tmp_path / "docs_a"
+    docs_b = tmp_path / "docs_b"
+    docs_a.mkdir()
+    docs_b.mkdir()
+    (docs_a / "x.md").write_text("# X\n\nhi")
+    (docs_b / "y.md").write_text("# Y\n\nyo")
+    return Catalog(
+        collections=(
+            Collection(
+                name="aaa",
+                display_name="甲",
+                docs_dir=docs_a,
+                retriever_factory=lambda d, n: _AltStub(d, n),
+            ),
+            Collection(
+                name="bbb",
+                display_name="乙",
+                docs_dir=docs_b,
+                retriever_factory=lambda d, n: _AltStub(d, n),
+            ),
+        )
+    )
+
+
 def test_e2e_full_pipeline_runs(monkeypatch, tmp_path):
     monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
     cfg = load_config()
-    chroma_p = tmp_path / "chroma"
-    chroma_p.mkdir()
+    catalog = _two_collection_catalog(tmp_path)
 
-    chroma = ChromaRetriever(persist_dir=chroma_p)
-    chroma.ensure_indexed(str(DOCS_DIR))
-
-    retrievers = {"chroma": chroma}
+    retrievers = {name: catalog.get(name).retriever for name in catalog.names()}
 
     fake = _FakeStream()
 
@@ -76,18 +135,27 @@ def test_e2e_full_pipeline_runs(monkeypatch, tmp_path):
 
     out = answer_stream(retrievers, llm, "什么是 RAG？", k=cfg.retrieve_k)
 
-    for name in ("chroma",):
+    for name in catalog.names():
         stream, hits, perf_fn = out[name]
         # Stream must be iterable.
         tokens = list(stream)
         assert tokens == ["TEST ANSWER"]
-        # Hits must come from real docs in docs/rag_doc.
+        # Hits must come from the selected collection.
         assert hits
         for h in hits:
-            assert (DOCS_DIR / h.source_file).exists(), h.source_file
+            assert name in h.source_file, h.source_file
         # Perf must be populated.
         perf = perf_fn()
         assert perf.total_ms >= 0
         assert perf.retrieve_ms >= 0
         assert perf.first_token_ms >= 0
         assert perf.finished_at
+
+
+def test_e2e_build_app_renders_two_collections(tmp_path: Path):
+    catalog = _two_collection_catalog(tmp_path)
+    config = _make_config(tmp_path)
+    app = build_app(catalog=catalog, llm=_stub_llm(), config=config)
+    rendered = str(app.config)
+    assert "甲" in rendered
+    assert "乙" in rendered

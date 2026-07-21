@@ -1,4 +1,16 @@
-"""RAG pipeline prompt construction, parallel retrieval, and streaming perf."""
+"""RAG pipeline prompt construction, parallel retrieval, and streaming perf.
+
+`answer_stream` supports two calling modes:
+
+  1. Single-collection mode (new collection picker UI):
+       answer_stream({slug: retriever}, llm, q)
+
+  2. Multi-retriever parallel compare (legacy Chroma vs Milvus demo):
+       answer_stream({"chroma": c, "milvus": m}, llm, q)
+
+Both modes share the same internals: parallel retrieve → per-side
+build_prompt → per-side streamed generation.
+"""
 
 from __future__ import annotations
 
@@ -29,13 +41,10 @@ logger = logging.getLogger(__name__)
 #     "你是一个 RAG 助手。当前没有检索到任何相关上下文，"
 #     "请直接告诉用户「未找到相关上下文」，不要使用先验知识或编造内容。"
 # )
-SYSTEM_PROMPT = (
-    "你是一个 RAG 助手。尽量基于下方提供的「上下文」回答用户问题。"
-)
+SYSTEM_PROMPT = "你是一个 RAG 助手。尽量基于下方提供的「上下文」回答用户问题。"
 
-EMPTY_HITS_SYSTEM_PROMPT = (
-    "你是一个 RAG 助手。"
-)
+EMPTY_HITS_SYSTEM_PROMPT = "你是一个 RAG 助手。"
+
 
 @dataclass(frozen=True)
 class StreamPerf:
