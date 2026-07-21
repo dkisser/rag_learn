@@ -108,3 +108,30 @@ class Catalog:
                 logger.warning("Catalog ingest failed for %r: %s", c.name, exc)
                 warnings.append((c.name, str(exc)))
         return warnings
+
+
+def _build_builtin() -> tuple[Collection, ...]:
+    from rag_learn.config import _repo_root
+
+    root = _repo_root() / "docs"
+    return (
+        Collection(
+            name="rag_doc",
+            display_name="RAG 论文集",
+            docs_dir=root / "rag_doc",
+            description="25 篇 RAG 相关论文 / 综述 / 实践文章",
+        ),
+        Collection(
+            name="shanzhongshi",
+            display_name="山中事咖啡",
+            docs_dir=root / "shanzhongshi",
+            description="山中事咖啡（SHAN.IN COFFEE）的豆子参数、冲煮教程与公司信息",
+        ),
+    )
+
+
+BUILTIN_COLLECTIONS: tuple[Collection, ...] = _build_builtin()
+
+
+def build_catalog() -> Catalog:
+    return Catalog(collections=BUILTIN_COLLECTIONS)

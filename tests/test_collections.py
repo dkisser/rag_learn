@@ -190,3 +190,31 @@ def test_catalog_ensure_all_indexed_fail_open(fake_docs: Path):
     assert "boom" in msg
     # good one still got constructed
     assert a.retriever.ensure_calls == 1  # type: ignore[attr-defined]
+
+
+# ---- BUILTIN_COLLECTIONS + build_catalog ----
+
+
+def test_build_catalog_contains_rag_doc_and_shanzhongshi():
+    from rag_learn.collections import build_catalog
+
+    catalog = build_catalog()
+    names = set(catalog.names())
+    assert {"rag_doc", "shanzhongshi"}.issubset(names)
+
+
+def test_builtin_collections_point_at_real_docs_dirs():
+    from rag_learn.collections import BUILTIN_COLLECTIONS
+
+    for c in BUILTIN_COLLECTIONS:
+        assert c.docs_dir.is_dir(), f"{c.name} docs missing at {c.docs_dir}"
+
+
+def test_builtin_collection_names_have_chroma_compatible_slugs():
+    import re
+
+    from rag_learn.collections import BUILTIN_COLLECTIONS
+
+    pat = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{1,61}[A-Za-z0-9]$")
+    for c in BUILTIN_COLLECTIONS:
+        assert pat.match(c.name), f"bad slug: {c.name}"
