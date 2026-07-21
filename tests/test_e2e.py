@@ -9,6 +9,7 @@ calling DeepSeek.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from rag_learn.app import build_app
 from rag_learn.collections import Catalog, Collection
@@ -76,11 +77,11 @@ def _make_config(tmp_path: Path) -> Config:
     )
 
 
-def _stub_llm():
+def _stub_llm() -> Any:
     """Fake DeepSeekLLM whose .stream yields a single token."""
 
     class _StubLLM:
-        def stream(self, system: str, user: str):
+        def stream(self, system: str, user: str) -> str:
             yield "ok"
 
     return _StubLLM()
@@ -159,3 +160,20 @@ def test_e2e_build_app_renders_two_collections(tmp_path: Path):
     rendered = str(app.config)
     assert "甲" in rendered
     assert "乙" in rendered
+
+
+def test_e2e_build_app_collection_selection_changes_chunks(tmp_path: Path):
+    """Selecting a different collection must drive retrieval to that side."""
+    catalog = _two_collection_catalog(tmp_path)
+    config = _make_config(tmp_path)
+    app = build_app(catalog=catalog, llm=_stub_llm(), config=config)
+
+    # The first registered event is submit.click(...).
+    submit_fn = app.fns[0].fn
+    for slug in ("aaa", "bbb"):
+        outputs = submit_fn(slug, f"question for {slug}")
+        assert isinstance(outputs, list) and len(outputs) == 4
+        chunks_md = outputs[2]
+        assert f"{slug}.md" in str(chunks_md), (
+            f"selection {slug!r} should drive retrieval from that collection"
+        )
