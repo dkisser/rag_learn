@@ -12,6 +12,7 @@ from typing import Any
 
 import gradio as gr
 
+from rag_learn.collections import Catalog, CollectionNotFoundError
 from rag_learn.config import Config
 from rag_learn.pipeline import StreamPerf, answer_stream
 from rag_learn.retriever import Hit
@@ -50,171 +51,114 @@ def _drain_to_chatbot(stream: Iterator[str]) -> str:
     return "".join(list(stream)) or "_（无输出）_"
 
 
-def _flatten_output_targets(
-    question: Any,
-    panels: dict[str, dict[str, Any]],
-    retriever_names: list[str],
-) -> list[Any]:
-    """Flat list of components that on_submit must return values for, in order.
-
-    Order: question first (so it clears on submit), then per-retriever
-    (bot, chunks, perf). Mirrors _flatten_output_values.
-
-    A previous version declared `outputs=[]` on submit.click and relied on
-    direct .value mutation. Gradio only re-renders declared outputs, so
-    those mutations never reached the UI — submit appeared to do nothing.
-    """
-    targets: list[Any] = [question]
-    for name in retriever_names:
-        targets.extend(
-            [
-                panels[name]["bot"],
-                panels[name]["chunks"],
-                panels[name]["perf"],
-            ]
-        )
-    return targets
-
-
-def _flatten_output_values(
-    question_value: str,
-    panels: dict[str, dict[str, Any]],
-    retriever_names: list[str],
-) -> list[Any]:
-    """Parallel to _flatten_output_targets: current .value of each component."""
-    values: list[Any] = [question_value]
-    for name in retriever_names:
-        values.extend(
-            [
-                panels[name]["bot"].value,
-                panels[name]["chunks"].value,
-                panels[name]["perf"].value,
-            ]
-        )
-    return values
-
-
 def build_app(
-    retrievers: dict[str, BaseRetriever],
+    catalog: Catalog,
     llm: Any,
     config: Config,
     warnings: list[tuple[str, str]] | None = None,
 ) -> gr.Blocks:
-    """Construct the Gradio UI but do not launch it.
+    """Construct the Gradio UI but do not launch it."""
+    choices = catalog.display_choices()
+    default_slug = choices[0][1] if choices else None
 
-    `warnings` is a list of (side_name, error_message) for retrievers whose
-    ingestion failed at startup (spec §5.5). When non-empty, a red banner
-    is rendered above the panels; failed sides are excluded from `retrievers`
-    upstream by `launch()`.
-    """
-    retriever_names = list(retrievers.keys())
-
-    with gr.Blocks(title="RAG Compare: Chroma vs Milvus") as app:
+    with gr.Blocks(title="RAG 多集合问答") as app:
         if warnings:
             warn_md = "\n".join(f"- **{name}**: {msg}" for name, msg in warnings)
-            gr.Markdown(f"⚠ **启动期侧 ingest 失败**（spec §5.5 fail-open）：\n\n{warn_md}")
+            gr.Markdown(f"⚠ **启动期集合 ingest 失败**：\n\n{warn_md}")
 
         gr.Markdown(
-            f"# RAG 多 Retriever 对比\n\n"
+            f"# RAG 多集合问答\n\n"
             f"模型：`{config.llm_model}` · Top-k: `{config.retrieve_k}` · "
             f"Chunk: `{config.chunk_size}` chars\n\n"
-            "输入问题 → 两侧并行检索 + 双侧流式生成 → 并排展示。"
+            "选择知识库 → 输入问题 → 流式生成回答。"
         )
         with gr.Row():
+            collection_dd = gr.Dropdown(
+                choices=choices,
+                label="知识库",
+                value=default_slug,
+            )
             question = gr.Textbox(
                 label="问题",
                 placeholder="例如：什么是 GraphRAG？",
                 lines=2,
+                scale=3,
             )
         with gr.Row():
             submit = gr.Button("发送", variant="primary")
             clear = gr.Button("清空")
 
         with gr.Row():
-            panels: dict[str, dict[str, Any]] = {}
-            for name in retriever_names:
-                with gr.Column():
-                    gr.Markdown(f"## {name.upper()}")
-                    # type='messages' picks the openai-style dict format
-                    # (role/content) — matches what on_submit appends below.
-                    # The default 'tuples' format is deprecated in 5.x and
-                    # emits a UserWarning at every Chatbot() construction.
-                    bot = gr.Chatbot(
-                        label=f"{name} 答案",
-                        height=400,
-                        type="messages",
-                    )
-                    with gr.Accordion("检索到的 chunks", open=False):
-                        chunks_md = gr.Markdown("_提交问题后展示_")
-                    perf_md = gr.Markdown(_format_perf(None))
-                    panels[name] = {
-                        "bot": bot,
-                        "chunks": chunks_md,
-                        "perf": perf_md,
-                    }
+            with gr.Column():
+                gr.Markdown("## 回答")
+                bot = gr.Chatbot(label="答案", height=400, type="messages")
+                with gr.Accordion("检索到的 chunks", open=False):
+                    chunks_md = gr.Markdown("_提交问题后展示_")
+                perf_md = gr.Markdown(_format_perf(None))
 
-        def on_submit(q: str) -> list[Any]:
+        def on_submit(collection_slug: str, q: str) -> list[Any]:
+            empty_outputs: list[Any] = [
+                gr.update(value=""),
+                [],
+                "_（无召回）_",
+                _format_perf(None),
+            ]
             if not q.strip():
-                return _flatten_output_values("", panels, retriever_names)
+                return empty_outputs
             try:
-                outputs = answer_stream(retrievers, llm, q, k=config.retrieve_k)
+                collection = catalog.get(collection_slug)
+            except CollectionNotFoundError:
+                logger.warning("Unknown collection slug: %r", collection_slug)
+                bot.value = [{"role": "assistant", "content": f"⚠ 未知集合：{collection_slug}"}]
+                return [gr.update(value=""), bot.value, "_（无召回）_", _format_perf(None)]
+
+            retriever = collection.retriever
+            try:
+                outputs = answer_stream(
+                    {collection_slug: retriever},
+                    llm,
+                    q,
+                    k=config.retrieve_k,
+                )
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
-                # Show a single banner-style error in the first chatbot.
-                first = retriever_names[0]
-                panels[first]["bot"].value = [
-                    {"role": "assistant", "content": f"⚠ 流水线失败：{exc}"}
-                ]
-                return _flatten_output_values("", panels, retriever_names)
+                bot.value = [{"role": "assistant", "content": f"⚠ 流水线失败：{exc}"}]
+                return [gr.update(value=""), bot.value, "_（无召回）_", _format_perf(None)]
 
-            # Display user question in each chatbot as history seed.
-            for name in retriever_names:
-                bot = panels[name]["bot"]
-                bot.value = bot.value + [{"role": "user", "content": q}]
+            bot.value = bot.value + [{"role": "user", "content": q}]
+            stream_iter, hits, perf_fn = outputs[collection_slug]
+            chunks_md.value = _format_chunks(hits)
+            try:
+                answer_text = _drain_to_chatbot(stream_iter)
+            except Exception as exc:  # noqa: BLE001 — spec §7 RetrievalError
+                logger.exception("retrieval / LLM stream failed for side=%s", collection_slug)
+                bot.value = bot.value + [{"role": "assistant", "content": f"⚠ 检索失败：{exc}"}]
+                perf_md.value = _format_perf(None)
+                return [gr.update(value=""), bot.value, chunks_md.value, perf_md.value]
 
-            # Known limitation: this handler batch-consumes each stream iterator
-            # via _drain_to_chatbot before updating the UI. The user sees nothing
-            # until BOTH sides complete. True per-token streaming (spec §5.2
-            # "threaded streams") would require converting on_submit to a generator
-            # that yields per-token updates via Gradio's response stream API.
-            # TODO: convert to incremental streaming once the demo UX matters.
-            # Tracked for the final-review follow-up list.
-            # Per-side stream + chunk + perf updates.
-            for name in retriever_names:
-                stream_iter, hits, perf_fn = outputs[name]
-                panels[name]["chunks"].value = _format_chunks(hits)
-                try:
-                    answer_text = _drain_to_chatbot(stream_iter)
-                except Exception as exc:  # noqa: BLE001 — spec §7 RetrievalError
-                    logger.exception("retrieval / LLM stream failed for side=%s", name)
-                    panels[name]["bot"].value = panels[name]["bot"].value + [
-                        {"role": "assistant", "content": f"⚠ 检索失败：{exc}"}
-                    ]
-                    panels[name]["perf"].value = _format_perf(None)
-                    continue
-                perf = perf_fn()
-                logger.info(
-                    "[%s] %-7s retrieve=%dms first_token=%dms total=%dms",
-                    perf.finished_at,
-                    name,
-                    int(perf.retrieve_ms),
-                    int(perf.first_token_ms),
-                    int(perf.total_ms),
-                )
-                bot = panels[name]["bot"]
-                bot.value = bot.value + [{"role": "assistant", "content": answer_text}]
-                panels[name]["perf"].value = _format_perf(perf)
+            perf = perf_fn()
+            logger.info(
+                "[%s] %-12s retrieve=%dms first_token=%dms total=%dms",
+                perf.finished_at,
+                collection_slug,
+                int(perf.retrieve_ms),
+                int(perf.first_token_ms),
+                int(perf.total_ms),
+            )
+            bot.value = bot.value + [{"role": "assistant", "content": answer_text}]
+            perf_md.value = _format_perf(perf)
+            return [gr.update(value=""), bot.value, chunks_md.value, perf_md.value]
 
-            return _flatten_output_values("", panels, retriever_names)
+        submit.click(
+            on_submit,
+            inputs=[collection_dd, question],
+            outputs=[question, bot, chunks_md, perf_md],
+        )
 
-        click_outputs = _flatten_output_targets(question, panels, retriever_names)
-        submit.click(on_submit, inputs=[question], outputs=click_outputs)
-
-        def on_clear():
-            for name in retriever_names:
-                panels[name]["bot"].value = []
-                panels[name]["chunks"].value = "_提交问题后展示_"
-                panels[name]["perf"].value = _format_perf(None)
+        def on_clear() -> Any:
+            bot.value = []
+            chunks_md.value = "_提交问题后展示_"
+            perf_md.value = _format_perf(None)
             return gr.update(value="")
 
         clear.click(on_clear, inputs=[], outputs=[question])

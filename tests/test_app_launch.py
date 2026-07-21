@@ -1,133 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from types import SimpleNamespace
 
-from rag_learn.app import (
-    _flatten_output_targets,
-    _flatten_output_values,
-    _migrate_legacy_chroma,
-    build_app,
-)
+import pytest
+
+from rag_learn.app import _migrate_legacy_chroma, build_app
+from rag_learn.collections import Catalog, Collection
 from rag_learn.config import Config
-from rag_learn.llm import DeepSeekLLM
-from rag_learn.retriever.chroma_impl import ChromaRetriever
-from rag_learn.retriever.milvus_impl import MilvusRetriever
-
-
-def _cfg(monkeypatch) -> Config:
-    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
-    from rag_learn.config import load_config
-
-    cfg = load_config()
-    cfg.chroma_dir.mkdir(parents=True, exist_ok=True)
-    return cfg
-
-
-def test_build_app_constructs_without_launching(tmp_path, monkeypatch):
-    chroma_p = tmp_path / "chroma"
-    chroma_p.mkdir()
-    milvus_p = tmp_path / "milvus.db"
-    cfg = _cfg(monkeypatch)
-    chroma = ChromaRetriever(persist_dir=cfg.chroma_dir)
-    milvus = MilvusRetriever(db_path=milvus_p, dim=384)
-    llm = DeepSeekLLM(api_key="k", client=object())  # not actually called
-
-    app = build_app(retrievers={"chroma": chroma, "milvus": milvus}, llm=llm, config=cfg)
-    assert app is not None
-
-
-def test_build_app_returns_gradio_blocks(tmp_path, monkeypatch):
-    chroma_p = tmp_path / "chroma"
-    chroma_p.mkdir()
-    milvus_p = tmp_path / "milvus.db"
-    cfg = _cfg(monkeypatch)
-    chroma = ChromaRetriever(persist_dir=cfg.chroma_dir)
-    milvus = MilvusRetriever(db_path=milvus_p, dim=384)
-    llm = DeepSeekLLM(api_key="k", client=object())
-
-    import gradio as gr
-
-    app = build_app(retrievers={"chroma": chroma, "milvus": milvus}, llm=llm, config=cfg)
-    assert isinstance(app, gr.Blocks)
-
-
-def test_build_app_with_warnings_constructs(tmp_path, monkeypatch):
-    chroma_p = tmp_path / "chroma"
-    chroma_p.mkdir()
-    milvus_p = tmp_path / "milvus.db"
-    cfg = _cfg(monkeypatch)
-    milvus = MilvusRetriever(db_path=milvus_p, dim=384)
-    llm = DeepSeekLLM(api_key="k", client=object())
-
-    app = build_app(
-        retrievers={"milvus": milvus},
-        llm=llm,
-        config=cfg,
-        warnings=[("chroma", "model download failed")],
-    )
-    assert app is not None
-
-
-# ---------------------------------------------------------------------------
-# _flatten_output_targets / _flatten_output_values
-#
-# The bug: submit.click(..., outputs=[]) made Gradio drop every per-component
-# .value mutation from on_submit, so the UI never updated. These helpers
-# pin down the contract that on_submit returns exactly the values for the
-# declared output targets.
-# ---------------------------------------------------------------------------
-
-
-def test_flatten_output_targets_chroma_only_has_four_components():
-    panels = {"chroma": {"bot": "b", "chunks": "c", "perf": "p"}}
-    assert _flatten_output_targets("q", panels, ["chroma"]) == ["q", "b", "c", "p"]
-
-
-def test_flatten_output_targets_two_retrievers_seven_components():
-    panels = {
-        "chroma": {"bot": "b1", "chunks": "c1", "perf": "p1"},
-        "milvus": {"bot": "b2", "chunks": "c2", "perf": "p2"},
-    }
-    assert _flatten_output_targets("q", panels, ["chroma", "milvus"]) == [
-        "q",
-        "b1",
-        "c1",
-        "p1",
-        "b2",
-        "c2",
-        "p2",
-    ]
-
-
-def test_flatten_output_values_matches_targets_in_order():
-    panels = {
-        "chroma": {
-            "bot": SimpleNamespace(value=[{"role": "assistant", "content": "hi"}]),
-            "chunks": SimpleNamespace(value="**chunks**"),
-            "perf": SimpleNamespace(value="42ms"),
-        },
-    }
-    assert _flatten_output_values("", panels, ["chroma"]) == [
-        "",
-        [{"role": "assistant", "content": "hi"}],
-        "**chunks**",
-        "42ms",
-    ]
-
-
-def test_flatten_output_values_clear_question_with_empty_string():
-    panels = {
-        "chroma": {
-            "bot": SimpleNamespace(value=[]),
-            "chunks": SimpleNamespace(value=""),
-            "perf": SimpleNamespace(value=""),
-        }
-    }
-    assert _flatten_output_values("", panels, ["chroma"])[0] == ""
-
-
-# ---- _migrate_legacy_chroma ----
+from rag_learn.retriever.base import Hit
 
 
 def _make_config(tmp_path: Path) -> Config:
@@ -144,6 +24,9 @@ def _make_config(tmp_path: Path) -> Config:
         chroma_dir=tmp_path / "data" / "chroma",
         milvus_path=tmp_path / "data" / "milvus.db",
     )
+
+
+# ---- _migrate_legacy_chroma ----
 
 
 def test_migrate_noop_when_target_exists(tmp_path: Path) -> None:
@@ -201,3 +84,91 @@ def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path) -> None:
 
     assert not (config.chroma_dir / "rag_doc").exists()
     assert not (config.chroma_dir / ".migrated").exists()
+
+
+# ---- build_app(catalog=...) ----
+
+
+class StubRetriever:
+    """Satisfies BaseRetriever Protocol without touching Chroma."""
+
+    def __init__(self, persist_dir: Path, collection_name: str) -> None:
+        self.persist_dir = persist_dir
+        self.collection_name = collection_name
+        self.queries: list[str] = []
+
+    def ensure_indexed(self, docs_dir: str) -> None:
+        pass
+
+    def search(self, query: str, k: int = 5) -> list[Hit]:
+        self.queries.append(query)
+        return [
+            Hit(
+                text=f"hit-for-{self.collection_name}",
+                source_file=f"{self.collection_name}.md",
+                chunk_index=0,
+                score=0.1,
+            )
+        ]
+
+
+@pytest.fixture
+def stub_catalog(tmp_path: Path) -> Catalog:
+    docs_a = tmp_path / "docs_a"
+    docs_b = tmp_path / "docs_b"
+    docs_a.mkdir()
+    docs_b.mkdir()
+    (docs_a / "x.md").write_text("# X\n\nhi")
+    (docs_b / "y.md").write_text("# Y\n\nyo")
+    return Catalog(
+        collections=(
+            Collection(
+                name="aaa",
+                display_name="甲集",
+                docs_dir=docs_a,
+                retriever_factory=lambda d, n: StubRetriever(d, n),
+            ),
+            Collection(
+                name="bbb",
+                display_name="乙集",
+                docs_dir=docs_b,
+                retriever_factory=lambda d, n: StubRetriever(d, n),
+            ),
+        )
+    )
+
+
+def _stub_llm():
+    """Fake DeepSeekLLM whose .stream yields a single token."""
+
+    class _StubLLM:
+        def stream(self, system: str, user: str):
+            yield "ok"
+
+    return _StubLLM()
+
+
+def test_build_app_with_catalog_builds_dropdown(stub_catalog: Catalog, tmp_path: Path):
+    config = _make_config(tmp_path)
+    app = build_app(catalog=stub_catalog, llm=_stub_llm(), config=config)
+    # Gradio Blocks exposes its component tree; we check the rendered text via
+    # its .config dict representation. Asserting "甲集" / "乙集" appear means
+    # the Dropdown choices wired up.
+    rendered = str(app.config)
+    assert "甲集" in rendered
+    assert "乙集" in rendered
+    assert "知识库" in rendered  # the Dropdown label
+
+
+def test_build_app_warns_on_failed_collections(stub_catalog: Catalog, tmp_path: Path):
+    config = _make_config(tmp_path)
+    app = build_app(
+        catalog=stub_catalog,
+        llm=_stub_llm(),
+        config=config,
+        warnings=[("aaa", "boom")],
+    )
+    rendered = str(app.config)
+    assert "启动期集合 ingest 失败" in rendered
+    assert "aaa" in rendered
+    assert "boom" in rendered
