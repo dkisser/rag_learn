@@ -302,8 +302,10 @@ def _migrate_legacy_chroma(config: Config) -> None:
     if not config.chroma_dir.exists():
         return
 
-    legacy: list[Path] = list(config.chroma_dir.glob("chroma.sqlite3"))
-    legacy += [p for p in config.chroma_dir.iterdir() if p.is_dir() and _UUID_RE.match(p.name)]
+    legacy: list[Path] = [
+        *config.chroma_dir.glob("chroma.sqlite3"),
+        *(p for p in config.chroma_dir.iterdir() if p.is_dir() and _UUID_RE.match(p.name)),
+    ]
     if not legacy:
         return
 

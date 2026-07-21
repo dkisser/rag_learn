@@ -146,7 +146,7 @@ def _make_config(tmp_path: Path) -> Config:
     )
 
 
-def test_migrate_noop_when_target_exists(tmp_path: Path):
+def test_migrate_noop_when_target_exists(tmp_path: Path) -> None:
     config = _make_config(tmp_path)
     config.chroma_dir.mkdir(parents=True)
     target = config.chroma_dir / "rag_doc"
@@ -161,7 +161,7 @@ def test_migrate_noop_when_target_exists(tmp_path: Path):
     assert not marker.exists()
 
 
-def test_migrate_moves_sqlite_and_uuid_dirs(tmp_path: Path):
+def test_migrate_moves_sqlite_and_uuid_dirs(tmp_path: Path) -> None:
     config = _make_config(tmp_path)
     config.chroma_dir.mkdir(parents=True)
     (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
@@ -176,10 +176,11 @@ def test_migrate_moves_sqlite_and_uuid_dirs(tmp_path: Path):
     assert (target / "chroma.sqlite3").read_text() == "legacy"
     assert (target / "01234567-89ab-cdef-0123-456789abcdef" / "index.bin").exists()
     assert not (config.chroma_dir / "chroma.sqlite3").exists()
+    assert not uuid_dir.exists()
     assert (config.chroma_dir / ".migrated").exists()
 
 
-def test_migrate_idempotent_via_marker(tmp_path: Path):
+def test_migrate_idempotent_via_marker(tmp_path: Path) -> None:
     config = _make_config(tmp_path)
     config.chroma_dir.mkdir(parents=True)
     (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
@@ -192,7 +193,7 @@ def test_migrate_idempotent_via_marker(tmp_path: Path):
     assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched
 
 
-def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path):
+def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path) -> None:
     config = _make_config(tmp_path)
     config.chroma_dir.mkdir(parents=True)
 
