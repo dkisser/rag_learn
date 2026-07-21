@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 
 from rag_learn.app import (
     _flatten_output_targets,
     _flatten_output_values,
+    _migrate_legacy_chroma,
     build_app,
 )
 from rag_learn.config import Config
@@ -123,3 +125,78 @@ def test_flatten_output_values_clear_question_with_empty_string():
         }
     }
     assert _flatten_output_values("", panels, ["chroma"])[0] == ""
+
+
+# ---- _migrate_legacy_chroma ----
+
+
+def _make_config(tmp_path: Path) -> Config:
+    return Config(
+        deepseek_api_key="dummy",
+        llm_model="dummy",
+        deepseek_base_url="https://example.invalid",
+        retrieve_k=5,
+        chunk_size=800,
+        chunk_overlap=50,
+        repo_root=tmp_path,
+        docs_dir=tmp_path / "docs",
+        data_dir=tmp_path / "data",
+        chroma_dir=tmp_path / "data" / "chroma",
+        milvus_path=tmp_path / "data" / "milvus.db",
+    )
+
+
+def test_migrate_noop_when_target_exists(tmp_path: Path):
+    config = _make_config(tmp_path)
+    config.chroma_dir.mkdir(parents=True)
+    target = config.chroma_dir / "rag_doc"
+    target.mkdir()
+    marker = config.chroma_dir / ".migrated"
+    # Drop a fake legacy file to prove it isn't touched
+    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
+
+    _migrate_legacy_chroma(config)
+
+    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched
+    assert not marker.exists()
+
+
+def test_migrate_moves_sqlite_and_uuid_dirs(tmp_path: Path):
+    config = _make_config(tmp_path)
+    config.chroma_dir.mkdir(parents=True)
+    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
+    uuid_dir = config.chroma_dir / "01234567-89ab-cdef-0123-456789abcdef"
+    uuid_dir.mkdir()
+    (uuid_dir / "index.bin").write_bytes(b"\x00" * 4)
+
+    _migrate_legacy_chroma(config)
+
+    target = config.chroma_dir / "rag_doc"
+    assert target.is_dir()
+    assert (target / "chroma.sqlite3").read_text() == "legacy"
+    assert (target / "01234567-89ab-cdef-0123-456789abcdef" / "index.bin").exists()
+    assert not (config.chroma_dir / "chroma.sqlite3").exists()
+    assert (config.chroma_dir / ".migrated").exists()
+
+
+def test_migrate_idempotent_via_marker(tmp_path: Path):
+    config = _make_config(tmp_path)
+    config.chroma_dir.mkdir(parents=True)
+    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
+    (config.chroma_dir / ".migrated").write_text("prior run")
+
+    _migrate_legacy_chroma(config)
+
+    target = config.chroma_dir / "rag_doc"
+    assert not target.exists()  # not migrated because marker says done
+    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched
+
+
+def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path):
+    config = _make_config(tmp_path)
+    config.chroma_dir.mkdir(parents=True)
+
+    _migrate_legacy_chroma(config)
+
+    assert not (config.chroma_dir / "rag_doc").exists()
+    assert not (config.chroma_dir / ".migrated").exists()

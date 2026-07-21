@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import logging
 import os
+import re
+import shutil
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import gradio as gr
@@ -13,6 +16,7 @@ from rag_learn.config import Config
 from rag_learn.pipeline import StreamPerf, answer_stream
 from rag_learn.retriever import Hit
 from rag_learn.retriever.base import BaseRetriever
+
 # from rag_learn.retriever.milvus_impl import MilvusRetriever
 
 logger = logging.getLogger(__name__)
@@ -276,3 +280,35 @@ def _ts() -> str:
     import time
 
     return time.strftime("%H:%M:%S") + f".{int((time.time() % 1) * 1000):03d}"
+
+
+# ---- Legacy migration ----
+
+
+_UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
+
+
+def _migrate_legacy_chroma(config: Config) -> None:
+    """一次性：把 data/chroma/ 根下的遗留文件搬到 data/chroma/rag_doc/。
+
+    触发条件：data/chroma/rag_doc/ 不存在 AND 没有 .migrated 标记 AND
+    chroma.sqlite3 或 UUID 子目录存在。
+    幂等：迁移完成后写 data/chroma/.migrated。
+    """
+    target = config.chroma_dir / "rag_doc"
+    marker = config.chroma_dir / ".migrated"
+    if target.exists() or marker.exists():
+        return
+    if not config.chroma_dir.exists():
+        return
+
+    legacy: list[Path] = list(config.chroma_dir.glob("chroma.sqlite3"))
+    legacy += [p for p in config.chroma_dir.iterdir() if p.is_dir() and _UUID_RE.match(p.name)]
+    if not legacy:
+        return
+
+    target.mkdir(parents=True, exist_ok=True)
+    for src in legacy:
+        shutil.move(str(src), str(target / src.name))
+    marker.write_text("migrated\n", encoding="utf-8")
+    logger.info("Migrated legacy Chroma data: %d entries -> %s", len(legacy), target)
