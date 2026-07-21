@@ -385,17 +385,13 @@ def answer_stream(
 | `Collection.__post_init__` ValueError | slug 不合规 / docs_dir 不存在 | 构造时 fail-fast（不能注册一个跑不起来的 collection） |
 | `Catalog.__post_init__` ValueError | 重名 slug | 构造时 fail-fast |
 | `CollectionNotFoundError` | UI 传未知 slug（理论上不会发生，dropdown 限定） | UI 显示 `⚠ 未知集合：{slug}` |
-| 单 collection `ensure_indexed` 抛异常 | Chroma 故障 / 文件权限 / embed 模型下载失败 | log warning；该 collection 从 UI 中**隐藏**？**还是**仍展示但 search() 返回空？—— 见 §7 决策 1 |
+| 单 collection `ensure_indexed` 抛异常 | Chroma 故障 / 文件权限 / embed 模型下载失败 | log warning；该 collection 从 Dropdown 中**剔除**（避免用户选了搜不到）；原始 catalog 不变，`warnings` 走顶部 banner |
 | `answer_stream` 抛异常 | embed / search / LLM 网络故障 | UI Chatbot 显示 `⚠ 流水线失败：{exc}` |
 | 流式生成中途异常 | LLM 连接中断 | Chatbot 显示 `⚠ 检索失败：{exc}`，perf 留空 |
 | 老 data/chroma 迁移失败 | shutil.move IO 错误 | log warning；继续启动（用户可手动 `make clean`） |
 
-**决策点（待 §6 写完后二次确认）**：单 collection ingest 失败时，
-该 collection 应该从 Dropdown choices 中**剔除**（避免用户选了搜不到），
-还是**保留**但 search() 返回 `[]`（保留选项可见，UI 显示"无召回"）？
-
-当前倾向：**剔除**。在 `build_app` 构造 UI 前，从 catalog 中过滤掉 ingest
-失败的 collection：
+**剔除失败 collection 的实现**：在 `build_app` 构造 UI 前，从 catalog
+中过滤掉 ingest 失败的 collection：
 
 ```python
 warnings, ready = _split_warnings(catalog, raw_warnings)
@@ -404,7 +400,9 @@ working_catalog = Catalog(collections=tuple(c for c in catalog.collections
 # build_app 接 working_catalog；UI Dropdown 只展示能用的
 ```
 
-`warnings` 走顶部 banner（与现有行为一致）。
+**退化策略**：如果剔除后 `working_catalog.collections` 为空，`launch()`
+抛 `SystemExit("所有 collection ingest 失败，无法启动")`，与现有"两个
+retriever 都没准备好" 路径一致。
 
 **保留原 §7 不变的项**：`_TimedIter` 内部 try/except、`on_submit` 的
 `except Exception` fail-open、`EmptyHit` system prompt 分支。
@@ -471,6 +469,5 @@ TDD mandatory，覆盖率门 `--cov-fail-under=80` 不变。
 
 设计阶段已收敛。本节列出**实施期**可能出现的小问题，不阻塞 spec 批准：
 
-1. §7 决策点：单 collection ingest 失败时从 Dropdown 剔除 vs 保留——倾向剔除，待 §6 实施时确认 Gradio Dropdown 能否在构造后修改 choices。
-2. `Collection.retriever` 的 lazy 属性 + `object.__setattr__` 在 dataclass(frozen=True) 上的兼容性——`pytest` + `ty` 跑过即知。
-3. `_migrate_legacy_chroma` 的 UUID 匹配正则——具体字符范围实施期定。
+1. `Collection.retriever` 的 lazy 属性 + `object.__setattr__` 在 dataclass(frozen=True) 上的兼容性——`pytest` + `ty` 跑过即知。
+2. `_migrate_legacy_chroma` 的 UUID 匹配正则——具体字符范围实施期定。
