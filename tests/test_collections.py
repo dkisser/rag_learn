@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from rag_learn.collections import Catalog, Collection, CollectionNotFoundError
 from rag_learn.retriever.base import BaseRetriever, Hit
 
 
@@ -107,3 +108,85 @@ def test_collection_is_frozen(fake_docs: Path):
     )
     with pytest.raises(FrozenInstanceError):
         c.display_name = "other"  # type: ignore[misc]
+
+
+# ---- Catalog ----
+
+
+def _make_collection(name: str, display: str, docs_dir: Path):
+    return Collection(
+        name=name,
+        display_name=display,
+        docs_dir=docs_dir,
+        retriever_factory=_fake_factory,
+    )
+
+
+def test_catalog_rejects_duplicate_names(fake_docs: Path):
+    a = _make_collection("dup", "甲", fake_docs)
+    b = _make_collection("dup", "乙", fake_docs)
+    with pytest.raises(ValueError, match="duplicate"):
+        Catalog(collections=(a, b))
+
+
+def test_catalog_names_returns_in_order(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    b = _make_collection("bbb", "乙", fake_docs)
+    c = Catalog(collections=(a, b))
+    assert c.names() == ["aaa", "bbb"]
+
+
+def test_catalog_display_choices(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    b = _make_collection("bbb", "乙", fake_docs)
+    c = Catalog(collections=(a, b))
+    assert c.display_choices() == [("甲", "aaa"), ("乙", "bbb")]
+
+
+def test_catalog_get_returns_matching(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    b = _make_collection("bbb", "乙", fake_docs)
+    c = Catalog(collections=(a, b))
+    assert c.get("bbb") is b
+
+
+def test_catalog_get_unknown_raises_collection_not_found(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    c = Catalog(collections=(a,))
+    with pytest.raises(CollectionNotFoundError):
+        c.get("nope")
+    # CollectionNotFoundError IS-A KeyError
+    with pytest.raises(KeyError):
+        c.get("nope")
+
+
+def test_catalog_ensure_all_indexed_calls_each_retriever_once(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    b = _make_collection("bbb", "乙", fake_docs)
+    c = Catalog(collections=(a, b))
+    warnings = c.ensure_all_indexed()
+    assert warnings == []
+    assert a.retriever.ensure_calls == 1  # type: ignore[attr-defined]
+    assert b.retriever.ensure_calls == 1  # type: ignore[attr-defined]
+
+
+def test_catalog_ensure_all_indexed_fail_open(fake_docs: Path):
+    a = _make_collection("good", "Good", fake_docs)
+
+    def boom(persist_dir: Path, name: str) -> BaseRetriever:
+        raise RuntimeError("boom")
+
+    bad = Collection(
+        name="bad",
+        display_name="Bad",
+        docs_dir=fake_docs,
+        retriever_factory=boom,
+    )
+    c = Catalog(collections=(a, bad))
+    warnings = c.ensure_all_indexed()
+    assert len(warnings) == 1
+    name, msg = warnings[0]
+    assert name == "bad"
+    assert "boom" in msg
+    # good one still got constructed
+    assert a.retriever.ensure_calls == 1  # type: ignore[attr-defined]

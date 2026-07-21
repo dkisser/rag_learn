@@ -60,3 +60,51 @@ class Collection:
             object.__setattr__(self, "_retriever", retriever)
         assert self._retriever is not None
         return self._retriever
+
+
+class CollectionNotFoundError(KeyError):
+    """请求的 collection 不在 Catalog 里。"""
+
+
+@dataclass(frozen=True)
+class Catalog:
+    """不可变集合注册表：slug → Collection 双向索引。"""
+
+    collections: tuple[Collection, ...]
+    _by_name: dict[str, Collection] | None = field(default=None, init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        names = [c.name for c in self.collections]
+        if len(names) != len(set(names)):
+            raise ValueError(f"duplicate collection names: {names}")
+        object.__setattr__(self, "_by_name", {c.name: c for c in self.collections})
+
+    def names(self) -> list[str]:
+        return [c.name for c in self.collections]
+
+    def display_choices(self) -> list[tuple[str, str]]:
+        return [(c.display_name, c.name) for c in self.collections]
+
+    def get(self, name: str) -> Collection:
+        assert self._by_name is not None
+        try:
+            return self._by_name[name]
+        except KeyError as exc:
+            raise CollectionNotFoundError(
+                f"collection {name!r} not in catalog; available: {self.names()}"
+            ) from exc
+
+    def ensure_all_indexed(self) -> list[tuple[str, str]]:
+        """Eager 触发每个 collection 的 retriever 懒加载。fail-open.
+
+        Returns list of (collection_name, error_message) for failures;
+        empty list = all collections indexed cleanly.
+        """
+        warnings: list[tuple[str, str]] = []
+        for c in self.collections:
+            try:
+                _ = c.retriever
+            except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
+                logger.warning("Catalog ingest failed for %r: %s", c.name, exc)
+                warnings.append((c.name, str(exc)))
+        return warnings
