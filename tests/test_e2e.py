@@ -147,7 +147,7 @@ def test_e2e_full_pipeline_runs(monkeypatch, tmp_path):
         for h in hits:
             assert name in h.source_file, h.source_file
         # Perf must be populated.
-        perf = perf_fn()
+        perf = perf_fn("TEST ANSWER")
         assert perf.total_ms >= 0
         assert perf.retrieve_ms >= 0
         assert perf.first_token_ms >= 0

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-from rag_learn.pipeline import StreamPerf, answer_stream
+from rag_learn.perf import StreamPerf
+from rag_learn.pipeline import answer_stream
 from rag_learn.retriever.base import Hit
 
 
@@ -42,7 +43,7 @@ def test_answer_stream_returns_both_sides():
     # Drain to populate perf
     for stream, _, perf_fn in out.values():
         list(stream)
-        assert isinstance(perf_fn(), StreamPerf)
+        assert isinstance(perf_fn(""), StreamPerf)
 
 
 def test_answer_stream_collects_tokens_in_order():

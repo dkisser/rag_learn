@@ -18,3 +18,4 @@ __pycache__/
 .coverage
 .ruff_cache/
 .ty_cache/
+.idea/

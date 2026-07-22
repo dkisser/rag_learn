@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ import pytest
 from rag_learn.app import _migrate_legacy_chroma, build_app
 from rag_learn.collections import Catalog, Collection
 from rag_learn.config import Config
+from rag_learn.eval.tracing import event_from_dict
 from rag_learn.retriever.base import BaseRetriever, Hit
 
 
@@ -193,6 +195,24 @@ def test_build_app_warns_on_failed_collections(stub_catalog: Catalog, tmp_path: 
     assert "启动期集合 ingest 失败" in rendered
     assert "aaa" in rendered
     assert "boom" in rendered
+
+
+def test_build_app_logs_event_to_jsonl(stub_catalog: Catalog, tmp_path: Path):
+    config = _make_config(tmp_path)
+    app = build_app(catalog=stub_catalog, llm=_stub_llm(), config=config)
+
+    submit_fn = app.fns[0].fn
+    outputs = submit_fn("aaa", "hello")
+    assert isinstance(outputs, list) and len(outputs) == 5
+
+    files = list(tmp_path.glob("data/rag_events_*.jsonl"))
+    assert len(files) == 1
+    with open(files[0], encoding="utf-8") as f:
+        data = json.loads(f.readline())
+    event = event_from_dict(data)
+    assert event.collection == "aaa"
+    assert event.question == "hello"
+    assert event.answer == "ok"
 
 
 # ---- launch() behavior (no real Gradio launch) ----

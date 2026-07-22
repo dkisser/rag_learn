@@ -16,15 +16,19 @@ from __future__ import annotations
 
 import logging
 import time
+import uuid
 from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from rag_learn.config import CHUNK_DISPLAY_CHARS
+from rag_learn.eval.tracing import RAGEvent
+from rag_learn.perf import StreamPerf
 from rag_learn.retriever import Hit
 
 if TYPE_CHECKING:
+    from rag_learn.eval.tracing import MetricsEmitter
     from rag_learn.llm import DeepSeekLLM
     from rag_learn.retriever.base import BaseRetriever
 
@@ -44,14 +48,6 @@ logger = logging.getLogger(__name__)
 SYSTEM_PROMPT = "你是一个 RAG 助手。尽量基于下方提供的「上下文」回答用户问题。"
 
 EMPTY_HITS_SYSTEM_PROMPT = "你是一个 RAG 助手。"
-
-
-@dataclass(frozen=True)
-class StreamPerf:
-    retrieve_ms: float
-    first_token_ms: float
-    total_ms: float
-    finished_at: str  # HH:MM:SS.mmm
 
 
 def build_prompt(chunks: list[Hit], question: str) -> tuple[str, str]:
@@ -106,21 +102,28 @@ def answer_stream(
     llm: DeepSeekLLM,
     question: str,
     k: int = 5,
-) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[], StreamPerf]]]:
+    emitter: MetricsEmitter | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]]:
     """Parallel retrieve → build prompt per side → stream tokens per side.
 
     Returns ``{name: (token_iterator, hits, perf_fn)}``. The ``perf_fn``
-    callable returns the populated :class:`StreamPerf` and MUST be invoked
-    AFTER the token iterator is fully drained by the caller.
+    callable accepts the fully drained answer text, optionally emits a
+    ``RAGEvent`` if an emitter was provided, and returns the populated
+    :class:`StreamPerf`. It MUST be invoked AFTER the token iterator is
+    fully drained by the caller.
     """
+    event_metadata = metadata or {}
     retrieve_started = time.perf_counter()
     hits_by_side = _retrieve(retrievers, question, k)
     retrieve_ms = (time.perf_counter() - retrieve_started) * 1000.0
 
     def _side(
+        name: str,
         hits: list[Hit],
-    ) -> tuple[Iterator[str], list[Hit], Callable[[], StreamPerf]]:
+    ) -> tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]:
         sys_msg, user_msg = build_prompt(hits, question)
+        prompt_text = f"{sys_msg}\n\n{user_msg}"
         started = time.perf_counter()
         out_perf_holder: list[StreamPerf] = []
 
@@ -153,9 +156,24 @@ def answer_stream(
 
         it = _TimedIter()
 
-        def get_perf() -> StreamPerf:
-            return out_perf_holder[0]
+        def get_perf(answer: str) -> StreamPerf:
+            perf = out_perf_holder[0]
+            if emitter is not None:
+                event: RAGEvent = RAGEvent(
+                    trace_id=str(uuid.uuid4()),
+                    timestamp=datetime.now(UTC).isoformat(),
+                    collection=name,
+                    question=question,
+                    hits=tuple(hits),
+                    prompt=prompt_text,
+                    answer=answer,
+                    perf=perf,
+                    ground_truth=None,
+                    metadata={**event_metadata, "k": k},
+                )
+                emitter.emit(event)
+            return perf
 
         return it, hits, get_perf
 
-    return {name: _side(hits_by_side[name]) for name in hits_by_side}
+    return {name: _side(name, hits_by_side[name]) for name in hits_by_side}

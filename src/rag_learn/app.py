@@ -14,8 +14,10 @@ import gradio as gr
 
 from rag_learn.collections import Catalog, CollectionNotFoundError, build_catalog
 from rag_learn.config import Config, ConfigError, load_config
+from rag_learn.eval import JSONLEmitter
 from rag_learn.llm import DeepSeekLLM
-from rag_learn.pipeline import StreamPerf, answer_stream
+from rag_learn.perf import StreamPerf
+from rag_learn.pipeline import answer_stream
 from rag_learn.retriever import Hit
 
 # from rag_learn.retriever.milvus_impl import MilvusRetriever
@@ -66,6 +68,8 @@ def build_app(
         warnings: Optional list of (collection_name, error_message) for
             collections that failed ingest during startup.
     """
+    emitter = JSONLEmitter(config.data_dir)
+
     choices = catalog.display_choices()
     default_slug = choices[0][1] if choices else None
 
@@ -136,6 +140,8 @@ def build_app(
                     llm,
                     q,
                     k=config.retrieve_k,
+                    emitter=emitter,
+                    metadata={"llm_model": config.llm_model},
                 )
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
@@ -165,7 +171,7 @@ def build_app(
                     perf_md.value,
                 ]
 
-            perf = perf_fn()
+            perf = perf_fn(answer_text)
             logger.info(
                 "[%s] %-12s retrieve=%dms first_token=%dms total=%dms",
                 perf.finished_at,
