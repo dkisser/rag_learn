@@ -99,7 +99,7 @@ class MetricsEmitter(Protocol):
 
 首批实现：
 
-- `JSONLEmitter(path: Path)`：按天轮转写入 JSONL。
+- `JSONLEmitter(dir_path: Path)`：按天轮转写入 `<dir_path>/rag_events_YYYY-MM-DD.jsonl`。
 - `ListEmitter()`：内存列表，专供测试使用。
 - `NullEmitter()`：空实现，用于默认不回退行为。
 
@@ -182,7 +182,7 @@ python -m rag_learn.eval.batch data/ --output report.json
 | 指标 | 说明 |
 |------|------|
 | `answer_exact_match` | 答案与标准答案是否完全匹配（偏严，仅供参考）。 |
-| `answer_f1` | 答案与标准答案的 token F1。 |
+| `answer_f1` | 答案与标准答案的字符/词 F1（使用简单分词，不引入额外 tokenizer 依赖）。 |
 | `answer_llm_correctness` | LLM-as-judge 判断答案是否正确。 |
 
 **无标准答案时（LLM-as-judge）：**
@@ -201,8 +201,8 @@ python -m rag_learn.eval.batch data/ --output report.json
 | `retrieve_ms` | `StreamPerf.retrieve_ms` |
 | `first_token_ms` | `StreamPerf.first_token_ms` |
 | `total_ms` | `StreamPerf.total_ms` |
-| `num_input_tokens` | prompt token 估算（tiktoken 或字符估算）。 |
-| `num_output_tokens` | 实际生成 token 数。 |
+| `num_input_tokens` | prompt 字符数估算（按 4 字符 ≈ 1 token），避免新增依赖。 |
+| `num_output_tokens` | 实际生成字符数估算（按 4 字符 ≈ 1 token）。 |
 | `error_flag` | 请求是否发生异常。 |
 | `empty_hits_flag` | 是否没有召回任何 chunk。 |
 
@@ -226,7 +226,7 @@ emit 时机：当 caller drain 完 iterator 并调用 `perf_fn()` 后，构造�
 
 ### 7.2 `app.py`
 
-- `build_app` 内部实例化 `JSONLEmitter(path=config.data_dir / "rag_events")`。
+- `build_app` 内部实例化 `JSONLEmitter(dir_path=config.data_dir)`。
 - 调用 `answer_stream` 时传入 `emitter`。
 - 保留原有 `logger.info` 性能日志，作为双重保障。
 
