@@ -140,3 +140,26 @@ def test_batch_skips_invalid_ground_truth_source_files(
         report = json.load(f)
     details = report["details"][0]
     assert "retrieval_recall@5" not in details["metrics"]
+
+
+def test_batch_details_include_question_answer_ground_truth(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+    emitter = JSONLEmitter(tmp_path)
+    emitter.emit(_make_event("t1", ground_truth=GroundTruth(answer="gt", source_files=("a.md",))))
+
+    output = tmp_path / "report.json"
+    rc = main([str(tmp_path), "--output", str(output), "--dry-run"])
+    assert rc == 0
+
+    with open(output, encoding="utf-8") as f:
+        report = json.load(f)
+    details = report["details"][0]
+    assert details["question"] == "q"
+    assert details["answer"] == "a"
+    assert details["ground_truth"] == {
+        "answer": "gt",
+        "source_files": ["a.md"],
+        "chunk_ids": [],
+    }
