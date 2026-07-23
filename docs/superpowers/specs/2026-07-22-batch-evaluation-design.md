@@ -63,6 +63,34 @@ GraphRAG 是什么,GraphRAG is a graph-based RAG approach.,18-graphrag.md,18-gra
 - Empty `answer` means `answer_f1` and `answer_llm_correctness` are not computed.
 - Empty `chunk_ids` is allowed.
 
+### Unified CSV Template
+
+The `sample` subcommand and the `run` subcommand use the **same CSV template**. This avoids column mismatch and lets you reuse a labeled sample file as a prepared question bank.
+
+**Template:**
+
+```csv
+question,answer,source_files,chunk_ids,collection
+```
+
+**After `sample` (ready for labeling):**
+
+```csv
+question,answer,source_files,chunk_ids,collection
+GraphRAG 是什么,,,,rag_doc
+什么是 RAG,,,,rag_doc
+```
+
+**After manual labeling (ready for `run`):**
+
+```csv
+question,answer,source_files,chunk_ids,collection
+GraphRAG 是什么,GraphRAG is a graph-based RAG approach.,18-graphrag.md,,rag_doc
+什么是 RAG,RAG stands for retrieval-augmented generation.,02-rag-survey-2024.md;README.md,,rag_doc
+```
+
+A hand-written question bank uses the identical format, so you can always append more rows to a labeled sample file and rerun evaluation.
+
 ---
 
 ## 4. CLI Interface
