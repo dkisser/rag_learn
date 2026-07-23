@@ -26,7 +26,7 @@ from rag_learn.eval.metrics import (
     retrieval_precision_at_k,
     retrieval_recall_at_k,
 )
-from rag_learn.eval.tracing import RAGEvent, event_from_dict
+from rag_learn.eval.tracing import GroundTruth, RAGEvent, event_from_dict
 from rag_learn.llm import DeepSeekLLM
 
 logger = logging.getLogger(__name__)
@@ -137,6 +137,16 @@ def _aggregate(values: list[float | None]) -> dict[str, float]:
     return {"mean": mean, "median": median, "p95": p95}
 
 
+def _ground_truth_to_dict(gt: GroundTruth | None) -> dict[str, Any] | None:
+    if gt is None:
+        return None
+    return {
+        "answer": gt.answer,
+        "source_files": list(gt.source_files),
+        "chunk_ids": list(gt.chunk_ids),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Batch evaluate RAG events")
     parser.add_argument("events_dir", type=Path, nargs="?", default=Path("data"))
@@ -186,7 +196,14 @@ def main(argv: list[str] | None = None) -> int:
                 by_collection[event.collection].setdefault(key, []).append(float(value))
 
         details.append(
-            {"trace_id": event.trace_id, "collection": event.collection, "metrics": event_metrics}
+            {
+                "trace_id": event.trace_id,
+                "collection": event.collection,
+                "question": event.question,
+                "answer": event.answer,
+                "ground_truth": _ground_truth_to_dict(event.ground_truth),
+                "metrics": event_metrics,
+            }
         )
 
     report["aggregates"] = {key: _aggregate(vals) for key, vals in metrics_by_key.items()}
