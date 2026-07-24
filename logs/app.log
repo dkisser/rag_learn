@@ -1,0 +1,17 @@
+2026-07-22 15:36:18,600 - rag_learn.app - INFO - Catalog: 2 collections ['rag_doc', 'shanzhongshi']
+2026-07-22 15:36:18,966 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-07-22 15:36:19,067 - chromadb.telemetry.product.posthog - ERROR - Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-07-22 15:36:19,069 - chromadb.telemetry.product.posthog - ERROR - Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-07-22 15:36:19,080 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-07-22 15:36:19,084 - chromadb.telemetry.product.posthog - ERROR - Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-07-22 15:36:19,085 - chromadb.telemetry.product.posthog - ERROR - Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-07-22 15:36:19,086 - rag_learn.app - INFO - Collection ready: rag_doc
+2026-07-22 15:36:19,086 - rag_learn.app - INFO - Collection ready: shanzhongshi
+2026-07-22 15:36:19,331 - httpx - INFO - HTTP Request: GET http://127.0.0.1:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-07-22 15:36:19,340 - httpx - INFO - HTTP Request: HEAD http://127.0.0.1:7860/ "HTTP/1.1 200 OK"
+2026-07-22 15:36:19,598 - httpx - INFO - HTTP Request: HEAD https://hf-mirror.com/api/telemetry/https%3A/api.gradio.app/gradio-initiated-analytics "HTTP/1.1 308 Permanent Redirect"
+2026-07-22 15:36:20,184 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2026-07-22 15:36:20,300 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/https%3A/api.gradio.app/gradio-initiated-analytics "HTTP/1.1 200 OK"
+2026-07-22 15:40:47,352 - chromadb.telemetry.product.posthog - ERROR - Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-07-22 15:40:47,876 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-22 15:40:50,343 - rag_learn.app - INFO - [15:40:50.341] rag_doc      retrieve=1247ms first_token=1470ms total=2945ms
