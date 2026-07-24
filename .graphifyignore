@@ -1,0 +1,7 @@
+# graphifyignore — gitignore-style rules layered on top of .gitignore
+# (graphify honors .gitignore automatically; only list paths NOT covered there).
+#
+# These are reference / data / learning material, not project source.
+# docs/ — RAG papers (docs/rag_doc/), evaluation specs (docs/superpowers/),
+#         and QA fixtures (docs/eval/). The actual library code lives under src/.
+docs/
