@@ -54,9 +54,13 @@ class NullEmitter:
 
 
 class JSONLEmitter:
-    def __init__(self, dir_path: Path) -> None:
+    def __init__(self, dir_path: Path, file_name: str | None = None) -> None:
         self.dir_path = Path(dir_path)
         self.dir_path.mkdir(parents=True, exist_ok=True)
+        self.file_name = file_name
+        if file_name is not None:
+            # Pre-create the file's parent so emit() never races on directory creation.
+            (self.dir_path / file_name).parent.mkdir(parents=True, exist_ok=True)
 
     def emit(self, event: RAGEvent) -> None:
         try:
@@ -69,6 +73,8 @@ class JSONLEmitter:
             logger.warning("Failed to emit RAGEvent to JSONL: %s", exc)
 
     def _path_for(self, timestamp: str) -> Path:
+        if self.file_name is not None:
+            return self.dir_path / self.file_name
         date = timestamp[:10]
         return self.dir_path / f"rag_events_{date}.jsonl"
 

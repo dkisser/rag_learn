@@ -108,6 +108,39 @@ def test_jsonl_emitter_is_safe_on_write_failure(tmp_path: Path, monkeypatch) -> 
     emitter.emit(_make_event())  # should not raise
 
 
+def test_jsonl_emitter_with_file_name_writes_literal_path(tmp_path: Path) -> None:
+    """With file_name set, JSONLEmitter writes to that exact file regardless of timestamp."""
+    out_file = tmp_path / "shanzhongshi_events.jsonl"
+    emitter = JSONLEmitter(tmp_path, file_name="shanzhongshi_events.jsonl")
+
+    emitter.emit(_make_event("t1"))
+    emitter.emit(_make_event("t2"))
+
+    assert out_file.is_file()
+    lines = out_file.read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 2
+    # No daily-rotation file should appear when file_name is fixed.
+    assert list(tmp_path.glob("rag_events_*.jsonl")) == []
+
+
+def test_jsonl_emitter_file_name_creates_parent_dirs(tmp_path: Path) -> None:
+    """file_name may include subdirectories; parent dirs are created."""
+    out_file = tmp_path / "nested" / "deep" / "events.jsonl"
+    emitter = JSONLEmitter(tmp_path, file_name="nested/deep/events.jsonl")
+
+    emitter.emit(_make_event("t1"))
+
+    assert out_file.is_file()
+
+
+def test_jsonl_emitter_default_daily_rotation_still_works(tmp_path: Path) -> None:
+    """Backwards compat: no file_name → keeps the rag_events_<date>.jsonl behavior."""
+    emitter = JSONLEmitter(tmp_path)
+    emitter.emit(_make_event("t1"))
+    files = list(tmp_path.glob("rag_events_*.jsonl"))
+    assert len(files) == 1
+
+
 def test_list_emitter_collects_events() -> None:
     emitter = ListEmitter()
     event = _make_event()

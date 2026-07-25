@@ -21,6 +21,28 @@ python main.py
 # open http://127.0.0.1:7860
 ```
 
+## Repository tooling
+
+This repository also depends on the `graphify` CLI (provided by the
+`graphifyy` package) for its codebase knowledge graph and navigation. The RAG
+application itself does not import `graphify` at runtime, but contributors need
+it to rebuild or query the generated artifacts in `graphify-out/`.
+
+```bash
+# Install the graphify CLI (uv is recommended)
+uv tool install graphifyy
+
+# Build or refresh the knowledge graph from the repository
+# (writes graphify-out/graph.json, graph.html, and GRAPH_REPORT.md)
+graphify .
+
+# Query an existing graph without rebuilding it
+graphify query "How does the retrieval pipeline work?"
+```
+
+If `graphify` is not installed, the application can still be launched, but
+repository graph navigation and graph regeneration are unavailable.
+
 ## How it works
 
 1. On first launch, the app ingests `docs/rag_doc/*.md` into
@@ -71,12 +93,45 @@ uv run python -m rag_learn.eval.cli sample data \
 # 2a) Run a Q&A bank through RAG, emit events, write a report
 uv run python -m rag_learn.eval.cli run qa.csv \
     --collection rag_doc \
-    --output-events data/rag_events \
-    --output-report data/report.json
+    --output-events data/shanzhongshi_events.jsonl \
+    --output-report data/shanzhongshi_report.json
 
-# 2b) Re-evaluate events on disk without re-querying (e.g. after tweaking metrics)
+# 2b) Re-evaluate events on disk without re-querying (e.g. after tweaking metrics).
+#     `evaluate` accepts either a single .jsonl file OR a directory of daily files.
 uv run python -m rag_learn.eval.cli evaluate data \
     --output data/report.json --dry-run
+```
+
+> Note: `--output-events` is now a literal `.jsonl` file path. The runner
+> writes every event to that exact file, and crash-resume reads from it
+> too. The `evaluate` subcommand still globs `data/rag_events_*.jsonl`
+> by default — pass it a single file if you want to evaluate one.
+
+### Rate limiting & crash-resume
+
+DeepSeek's free tier is sensitive to bursty traffic. `run` and `evaluate`
+pace every LLM call through a shared `RateLimiter` (token-bucket RPM +
+in-flight concurrency cap + 429 retry with exponential backoff).
+Defaults are conservative for the free tier; tune via flags:
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--max-concurrency` | `3` | Max simultaneous judge (or generation) calls. |
+| `--rate` | `20.0` | Requests per minute ceiling. Lower for free tier. |
+| `--max-retries` | `3` | Per-call retries on HTTP 429 before recording `None`. |
+| `--no-resume` | off | `run` only: re-process CSV rows whose question already has an emitted event. |
+
+`run` is crash-resume by default: if it is interrupted mid-CSV, re-running
+the same command skips `(collection, question)` pairs already written to
+the `--output-events` file. To force a full re-run after a schema change,
+pass `--no-resume`. Free-tier example that survives bursty traffic:
+
+```bash
+uv run python -m rag_learn.eval.cli run docs/eval/shanzhongshi_qa.csv \
+    --collection shanzhongshi \
+    --output-events data/shanzhongshi_events.jsonl \
+    --output-report data/shanzhongshi_report.json \
+    --max-concurrency 1 --rate 5
 ```
 
 The report aggregates supervised metrics (`retrieval_recall@k`,

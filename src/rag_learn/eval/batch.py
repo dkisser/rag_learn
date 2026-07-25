@@ -9,6 +9,7 @@ import os
 import sys
 from collections import defaultdict
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
@@ -28,14 +29,26 @@ from rag_learn.eval.metrics import (
 )
 from rag_learn.eval.tracing import GroundTruth, RAGEvent, event_from_dict
 from rag_learn.llm import DeepSeekLLM
+from rag_learn.rate_limit import RateLimiter, is_rate_limit_error
 
 logger = logging.getLogger(__name__)
 
 
-def _load_events(events_dir: Path) -> tuple[list[RAGEvent], int]:
+def _load_events(events_path: Path) -> tuple[list[RAGEvent], int]:
+    """Load events from either a single .jsonl file or a directory of them.
+
+    When ``events_path`` is a file, read it directly. When it's a directory,
+    glob ``rag_events_*.jsonl`` (the daily-rotation scheme used by the
+    Gradio app and older runs).
+    """
+    if events_path.is_file():
+        files = [events_path]
+    else:
+        files = sorted(events_path.glob("rag_events_*.jsonl"))
+
     events: list[RAGEvent] = []
     skipped = 0
-    for path in sorted(events_dir.glob("rag_events_*.jsonl")):
+    for path in files:
         with open(path, encoding="utf-8") as f:
             for line_number, line in enumerate(f, start=1):
                 line = line.strip()
@@ -108,20 +121,49 @@ def _safe_judge(
         return None
 
 
-def _compute_unsupervised(event: RAGEvent, judge_fn: Callable[[str, str], str]) -> dict[str, Any]:
-    metrics: dict[str, Any] = {
-        "context_relevance": _safe_judge(context_relevance, event, judge_fn, "context_relevance"),
-        "faithfulness": _safe_judge(faithfulness, event, judge_fn, "faithfulness"),
-        "answer_relevance": _safe_judge(answer_relevance, event, judge_fn, "answer_relevance"),
-        "overall_usefulness": _safe_judge(
-            overall_usefulness, event, judge_fn, "overall_usefulness"
-        ),
-    }
+_UNSUPERVISED_METRICS: tuple[
+    tuple[str, Callable[[RAGEvent, Callable[[str, str], str]], float | None]], ...
+] = (
+    ("context_relevance", context_relevance),
+    ("faithfulness", faithfulness),
+    ("answer_relevance", answer_relevance),
+    ("overall_usefulness", overall_usefulness),
+)
+
+
+def _compute_unsupervised(
+    event: RAGEvent,
+    judge_fn: Callable[[str, str], str],
+    limiter: RateLimiter,
+) -> dict[str, Any]:
+    """Run unsupervised judge metrics under a shared ``RateLimiter``.
+
+    All metrics are dispatched in parallel via a ThreadPoolExecutor sized
+    by the limiter's concurrency cap. 429 retries and rate pacing are
+    handled inside ``limiter.call``; if retries are exhausted we record
+    ``None`` for that metric instead of propagating.
+    """
+    metrics_to_run = list(_UNSUPERVISED_METRICS)
     if event.ground_truth is not None and event.ground_truth.answer:
-        metrics["answer_llm_correctness"] = _safe_judge(
-            answer_llm_correctness, event, judge_fn, "answer_llm_correctness"
-        )
-    return metrics
+        metrics_to_run = [*metrics_to_run, ("answer_llm_correctness", answer_llm_correctness)]
+
+    results: dict[str, float | None] = {}
+    with ThreadPoolExecutor(max_workers=limiter.max_concurrency) as ex:
+        futures = {
+            name: ex.submit(limiter.call, fn, event, judge_fn) for name, fn in metrics_to_run
+        }
+        for name, fut in futures.items():
+            try:
+                results[name] = fut.result()
+            except Exception as exc:  # noqa: BLE001
+                if is_rate_limit_error(exc):
+                    logger.warning(
+                        "Judge %s gave up after retries for trace %s", name, event.trace_id
+                    )
+                else:
+                    logger.warning("Judge %s failed for trace %s: %s", name, event.trace_id, exc)
+                results[name] = None
+    return dict(results)
 
 
 def _aggregate(values: list[float | None]) -> dict[str, float]:
@@ -153,6 +195,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--judge-model", default=os.environ.get("LLM_MODEL", "deepseek-v4-flash"))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--max-concurrency", type=int, default=3, help="Max in-flight judge calls")
+    parser.add_argument(
+        "--rate", type=float, default=20.0, help="Judge requests per minute (per limiter)"
+    )
+    parser.add_argument("--max-retries", type=int, default=3, help="Retries per judge call on 429")
     args = parser.parse_args(argv)
 
     if args.dry_run:
@@ -176,8 +223,14 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     judge_fn: Callable[[str, str], str] | None = None
+    limiter: RateLimiter | None = None
     if not args.dry_run and config is not None and (without_gt or with_gt):
         judge_fn = _make_judge_fn(config, args.judge_model)
+        limiter = RateLimiter(
+            max_concurrency=args.max_concurrency,
+            rate_per_minute=args.rate,
+            max_retries=args.max_retries,
+        )
 
     details: list[dict[str, Any]] = []
     metrics_by_key: dict[str, list[float | None]] = defaultdict(list)
@@ -187,8 +240,8 @@ def main(argv: list[str] | None = None) -> int:
         event_metrics: dict[str, Any] = {}
         if event.ground_truth is not None:
             event_metrics.update(_compute_supervised(event, k))
-        if judge_fn is not None:
-            event_metrics.update(_compute_unsupervised(event, judge_fn))
+        if judge_fn is not None and limiter is not None:
+            event_metrics.update(_compute_unsupervised(event, judge_fn, limiter))
 
         for key, value in event_metrics.items():
             if isinstance(value, (int, float)):

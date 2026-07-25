@@ -1,8 +1,16 @@
-"""Run a prepared Q&A CSV through the RAG pipeline and evaluate it."""
+"""Run a prepared Q&A CSV through the RAG pipeline and evaluate it.
+
+Pacing is delegated to :class:`rag_learn.rate_limit.RateLimiter` so we
+don't burst DeepSeek's free-tier RPM. By default a re-run with the same
+``--output-events`` directory skips (collection, question) pairs that
+already have an emitted event; pass ``resume=False`` to force a full
+re-process.
+"""
 
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import uuid
 from datetime import UTC, datetime
@@ -16,6 +24,7 @@ from rag_learn.eval.batch import main as batch_main
 from rag_learn.eval.tracing import JSONLEmitter, RAGEvent
 from rag_learn.llm import DeepSeekLLM
 from rag_learn.pipeline import answer_stream
+from rag_learn.rate_limit import RateLimiter
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +39,34 @@ def _make_llm(config: Any) -> DeepSeekLLM:
         model=config.llm_model,
         base_url=config.deepseek_base_url,
     )
+
+
+def _load_existing_keys(events_file: Path) -> set[tuple[str, str]]:
+    """Return (collection, question) pairs already emitted to ``events_file``.
+
+    Reads a single JSONL file (the one we'll also write to). If the file
+    doesn't exist yet, returns an empty set.
+    """
+    keys: set[tuple[str, str]] = set()
+    if not events_file.is_file():
+        return keys
+    with open(events_file, encoding="utf-8") as f:
+        for line_number, line in enumerate(f, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "Skipping corrupted event line %s:%d: %s", events_file, line_number, exc
+                )
+                continue
+            collection = record.get("collection", "")
+            question = record.get("question", "")
+            if collection and question:
+                keys.add((collection, question))
+    return keys
 
 
 def _process_row(
@@ -95,33 +132,68 @@ def run_qa_csv(
     output_events: Path,
     output_report: Path,
     judge_model: str | None = None,
+    *,
+    max_concurrency: int = 3,
+    rate_per_minute: float = 20.0,
+    max_retries: int = 3,
+    resume: bool = True,
 ) -> int:
     """Read a Q&A CSV, run each question through RAG, emit events, and evaluate."""
     config = load_config()
     catalog = _load_catalog()
     llm = _make_llm(config)
-    emitter = JSONLEmitter(output_events.parent)
+    emitter = JSONLEmitter(output_events.parent, file_name=output_events.name)
     metadata = {"llm_model": config.llm_model}
 
+    limiter = RateLimiter(
+        max_concurrency=max_concurrency,
+        rate_per_minute=rate_per_minute,
+        max_retries=max_retries,
+    )
+
+    existing: set[tuple[str, str]] = _load_existing_keys(output_events) if resume else set()
+
+    processed_count = 0
+    skipped_count = 0
     with open(qa_csv, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            _process_row(
-                row,
-                default_collection,
-                catalog,
-                llm,
-                emitter,
-                metadata,
-                config.retrieve_k,
-            )
+            question, collection_slug, _gt = parse_csv_row(row, default_collection)
+            if question is None or collection_slug is None:
+                continue
+            if (collection_slug, question) in existing:
+                logger.info("Skipping (already emitted): %s", question)
+                skipped_count += 1
+                continue
+            try:
+                limiter.call(
+                    _process_row,
+                    row,
+                    default_collection,
+                    catalog,
+                    llm,
+                    emitter,
+                    metadata,
+                    config.retrieve_k,
+                )
+                processed_count += 1
+            except Exception as exc:  # noqa: BLE001
+                logger.exception("Giving up on row after retries: %r (%s)", row, exc)
+
+    logger.info("Processed %d new rows, skipped %d already-emitted", processed_count, skipped_count)
 
     return batch_main(
         [
-            str(output_events.parent),
+            str(output_events),
             "--output",
             str(output_report),
             "--judge-model",
             judge_model or config.llm_model,
+            "--max-concurrency",
+            str(max_concurrency),
+            "--rate",
+            str(rate_per_minute),
+            "--max-retries",
+            str(max_retries),
         ]
     )

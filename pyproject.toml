@@ -24,6 +24,12 @@ dependencies = [
     "openai>=1.40,<2",
     "gradio>=5.0,<6",
     "python-dotenv>=1.0",
+    # Rate limiting for batch eval CLI: pyrate-limiter gives us a sync token/
+    # leaky bucket for RPM pacing; tenacity is the standard retry library
+    # (Apache 2.0) used here only for 429 backoff. Both are pure-Python and
+    # have stable APIs in the pinned major versions.
+    "pyrate-limiter>=3,<5",
+    "tenacity>=9,<10",
 ]
 
 [project.optional-dependencies]

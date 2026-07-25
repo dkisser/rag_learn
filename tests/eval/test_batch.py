@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+import threading
+import time
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -163,3 +166,127 @@ def test_batch_details_include_question_answer_ground_truth(
         "source_files": ["a.md"],
         "chunk_ids": [],
     }
+
+
+def test_batch_judges_observe_concurrency_cap(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Concurrent judge calls must not exceed the configured max_concurrency."""
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+
+    # Three events × four unsupervised metrics each → 12 judge calls total.
+    emitter = JSONLEmitter(tmp_path)
+    for i in range(3):
+        emitter.emit(_make_event(f"t{i}"))
+
+    in_flight = 0
+    peak = 0
+    lock = threading.Lock()
+    barrier = threading.Barrier(12)
+
+    def tracking_judge(system: str, user: str) -> str:
+        nonlocal in_flight, peak
+        with lock:
+            in_flight += 1
+            peak = max(peak, in_flight)
+        try:
+            barrier.wait(timeout=2.0)
+            time.sleep(0.05)
+            return "4"
+        finally:
+            with lock:
+                in_flight -= 1
+
+    monkeypatch.setattr(batch_module, "_make_judge_fn", lambda _config, _model: tracking_judge)
+
+    output = tmp_path / "report.json"
+    rc = main(
+        [
+            str(tmp_path),
+            "--output",
+            str(output),
+            "--max-concurrency",
+            "2",
+            "--max-retries",
+            "1",
+        ]
+    )
+    assert rc == 0
+    assert peak <= 2, f"observed peak concurrency {peak} > 2"
+
+
+def test_batch_retries_judge_on_rate_limit_then_succeeds(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Judge raising RateLimitError twice then returning a score must succeed."""
+    from openai import RateLimitError
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+    emitter = JSONLEmitter(tmp_path)
+    emitter.emit(_make_event("t1", ground_truth=GroundTruth(answer="gt", source_files=("a.md",))))
+
+    calls = {"n": 0}
+
+    def flaky_judge(system: str, user: str) -> str:
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise RateLimitError("429", response=MagicMock(), body={})
+        return "4"
+
+    monkeypatch.setattr(batch_module, "_make_judge_fn", lambda _config, _model: flaky_judge)
+
+    output = tmp_path / "report.json"
+    rc = main(
+        [
+            str(tmp_path),
+            "--output",
+            str(output),
+            "--max-concurrency",
+            "1",
+            "--max-retries",
+            "3",
+        ]
+    )
+    assert rc == 0
+
+    with open(output, encoding="utf-8") as f:
+        report = json.load(f)
+    details = report["details"][0]
+    assert details["metrics"]["context_relevance"] == 0.8
+    assert details["metrics"]["answer_llm_correctness"] == 0.8
+
+
+def test_batch_judge_exhausting_retries_records_none(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A judge that always 429s yields None for that metric, never raises."""
+    from openai import RateLimitError
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+    emitter = JSONLEmitter(tmp_path)
+    emitter.emit(_make_event("t1"))
+
+    def always_429(system: str, user: str) -> str:
+        raise RateLimitError("429", response=MagicMock(), body={})
+
+    monkeypatch.setattr(batch_module, "_make_judge_fn", lambda _config, _model: always_429)
+
+    output = tmp_path / "report.json"
+    rc = main(
+        [
+            str(tmp_path),
+            "--output",
+            str(output),
+            "--max-concurrency",
+            "1",
+            "--max-retries",
+            "2",
+        ]
+    )
+    assert rc == 0
+
+    with open(output, encoding="utf-8") as f:
+        report = json.load(f)
+    details = report["details"][0]
+    assert details["metrics"]["context_relevance"] is None
+    assert details["metrics"]["faithfulness"] is None

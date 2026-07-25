@@ -24,12 +24,23 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--output-events", type=Path, required=True)
     run_parser.add_argument("--output-report", type=Path, required=True)
     run_parser.add_argument("--judge-model", default=None)
+    run_parser.add_argument("--max-concurrency", type=int, default=3)
+    run_parser.add_argument("--rate", type=float, default=20.0)
+    run_parser.add_argument("--max-retries", type=int, default=3)
+    run_parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Re-process all rows even if events for the same question exist on disk",
+    )
 
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate existing events")
     eval_parser.add_argument("events_dir", type=Path)
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.add_argument("--judge-model", default=None)
     eval_parser.add_argument("--dry-run", action="store_true")
+    eval_parser.add_argument("--max-concurrency", type=int, default=3)
+    eval_parser.add_argument("--rate", type=float, default=20.0)
+    eval_parser.add_argument("--max-retries", type=int, default=3)
 
     return parser
 
@@ -50,10 +61,24 @@ def main(argv: list[str] | None = None) -> int:
             args.output_events,
             args.output_report,
             judge_model=args.judge_model,
+            max_concurrency=args.max_concurrency,
+            rate_per_minute=args.rate,
+            max_retries=args.max_retries,
+            resume=not args.no_resume,
         )
 
     if args.command == "evaluate":
-        batch_argv = [str(args.events_dir), "--output", str(args.output)]
+        batch_argv = [
+            str(args.events_dir),
+            "--output",
+            str(args.output),
+            "--max-concurrency",
+            str(args.max_concurrency),
+            "--rate",
+            str(args.rate),
+            "--max-retries",
+            str(args.max_retries),
+        ]
         if args.judge_model:
             batch_argv.extend(["--judge-model", args.judge_model])
         if args.dry_run:

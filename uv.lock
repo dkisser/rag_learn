@@ -2431,6 +2431,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyrate-limiter"
+version = "4.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/27/e564f33ea085c63d5540f707b31aeb50a4992eac2da655dc02435a760a07/pyrate_limiter-4.4.0.tar.gz", hash = "sha256:2c0c720c4fa16c5d8199e4821bf34507fb49c007a25b786cec6fb94ffd0844aa", size = 90955, upload-time = "2026-06-14T10:52:03.021Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/77/2b5ea2e5e343fd7f74ba9c50a282d7cb66d1be3d12bd647510338d78fcf1/pyrate_limiter-4.4.0-py3-none-any.whl", hash = "sha256:f738dfa3c7ac1222a5ea3d31e00cfd31b5592b13ade4077afe9e8ac6293381f5", size = 43102, upload-time = "2026-06-14T10:52:01.334Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2554,8 +2563,10 @@ dependencies = [
     { name = "gradio" },
     { name = "openai" },
     { name = "pymilvus", extra = ["milvus-lite", "model"] },
+    { name = "pyrate-limiter" },
     { name = "python-dotenv" },
     { name = "sentence-transformers" },
+    { name = "tenacity" },
 ]
 
 [package.optional-dependencies]
@@ -2571,11 +2582,13 @@ requires-dist = [
     { name = "gradio", specifier = ">=5.0,<6" },
     { name = "openai", specifier = ">=1.40,<2" },
     { name = "pymilvus", extras = ["milvus-lite", "model"], specifier = ">=2.4,<3" },
+    { name = "pyrate-limiter", specifier = ">=3,<5" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
     { name = "sentence-transformers", specifier = ">=2.0" },
+    { name = "tenacity", specifier = ">=9,<10" },
 ]
 provides-extras = ["dev"]
 
