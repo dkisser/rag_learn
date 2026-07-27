@@ -39,8 +39,11 @@ def iter_markdown(docs_dir: str | Path) -> list[tuple[str, str]]:
 def _split_into_pre_docs(raw: str) -> list[str]:
     """Split a markdown file by H1 headings.
 
-    If no H1 is present, return the whole file as one document. The H1
-    line itself is omitted (it's metadata, not body).
+    Each pre-doc starts with its H1 line preserved as a markdown header
+    (so the title ends up in the chunk text and the embedding can match
+    on it), followed by the section body. Sections whose body is empty
+    are dropped. If no H1 is present, the whole file becomes a single
+    pre-doc.
     """
     matches = list(_H1_RE.finditer(raw))
     if not matches:
@@ -51,9 +54,13 @@ def _split_into_pre_docs(raw: str) -> list[str]:
     if pre:
         docs.append(pre)
     for i, m in enumerate(matches):
+        title_line = m.group(0)  # e.g. "# 苏帕摩-中度烘焙"
         start = m.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(raw)
-        docs.append(raw[start:end].strip())
+        body = raw[start:end].strip()
+        if not body:
+            continue
+        docs.append(f"{title_line}\n\n{body}")
     return [d for d in docs if d]
 
 

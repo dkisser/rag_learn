@@ -18,6 +18,7 @@ def test_load_documents_assigns_filenames():
         "doc_with_h1.md",
         "doc_no_h1.md",
         "doc_short_section.md",
+        "doc_beans.md",
     }
 
 
