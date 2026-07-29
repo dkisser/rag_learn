@@ -145,6 +145,34 @@ def test_batch_skips_invalid_ground_truth_source_files(
     assert "retrieval_recall@5" not in details["metrics"]
 
 
+def test_batch_computes_answer_f1_when_source_files_empty_but_answer_present(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Empty source_files means 'rely on model knowledge' — answer_f1 still applies."""
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+    emitter = JSONLEmitter(tmp_path)
+    emitter.emit(
+        _make_event(
+            "t1",
+            ground_truth=GroundTruth(answer="ground truth", source_files=()),
+        )
+    )
+
+    output = tmp_path / "report.json"
+    rc = main([str(tmp_path), "--output", str(output), "--dry-run"])
+    assert rc == 0
+
+    with open(output, encoding="utf-8") as f:
+        report = json.load(f)
+    details = report["details"][0]
+    assert "retrieval_recall@5" not in details["metrics"]
+    assert "retrieval_precision@5" not in details["metrics"]
+    assert "retrieval_mrr" not in details["metrics"]
+    assert "retrieval_ndcg@5" not in details["metrics"]
+    assert "answer_f1" in details["metrics"]
+    assert 0.0 <= details["metrics"]["answer_f1"] <= 1.0
+
+
 def test_batch_details_include_question_answer_ground_truth(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

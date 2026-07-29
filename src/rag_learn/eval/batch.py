@@ -77,18 +77,18 @@ def _dedupe(events: list[RAGEvent]) -> list[RAGEvent]:
 def _compute_supervised(event: RAGEvent, k: int) -> dict[str, Any]:
     assert event.ground_truth is not None
     source_files = event.ground_truth.source_files
-    if not source_files or not all(isinstance(f, str) and f for f in source_files):
+    metrics: dict[str, Any] = {}
+    if source_files and all(isinstance(f, str) and f for f in source_files):
+        metrics[f"retrieval_recall@{k}"] = retrieval_recall_at_k(event.hits, source_files, k)
+        metrics[f"retrieval_precision@{k}"] = retrieval_precision_at_k(event.hits, source_files, k)
+        metrics["retrieval_mrr"] = retrieval_mrr(event.hits, source_files)
+        metrics[f"retrieval_ndcg@{k}"] = retrieval_ndcg_at_k(event.hits, source_files, k)
+    else:
         logger.warning(
-            "Skipping supervised metrics for trace %s: invalid source_files",
+            "Skipping retrieval metrics for trace %s: no source_files "
+            "(question relies on model knowledge)",
             event.trace_id,
         )
-        return {}
-    metrics: dict[str, Any] = {
-        f"retrieval_recall@{k}": retrieval_recall_at_k(event.hits, source_files, k),
-        f"retrieval_precision@{k}": retrieval_precision_at_k(event.hits, source_files, k),
-        "retrieval_mrr": retrieval_mrr(event.hits, source_files),
-        f"retrieval_ndcg@{k}": retrieval_ndcg_at_k(event.hits, source_files, k),
-    }
     if event.ground_truth.answer:
         metrics["answer_f1"] = answer_f1(event.answer, event.ground_truth.answer)
     return metrics
