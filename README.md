@@ -23,22 +23,36 @@ python main.py
 
 ## Repository tooling
 
-This repository also depends on the `graphify` CLI (provided by the
-`graphifyy` package) for its codebase knowledge graph and navigation. The RAG
-application itself does not import `graphify` at runtime, but contributors need
-it to rebuild or query the generated artifacts in `graphify-out/`.
+This repository uses the `graphify` CLI (provided by the `graphifyy` package) as
+a development dependency. The RAG application itself does **not** import
+`graphify` at runtime, but contributors use it to navigate, query, and refresh
+the codebase knowledge graph in `graphify-out/`.
 
 ```bash
 # Install the graphify CLI (uv is recommended)
 uv tool install graphifyy
 
-# Build or refresh the knowledge graph from the repository
+# Build the knowledge graph from scratch
 # (writes graphify-out/graph.json, graph.html, and GRAPH_REPORT.md)
 graphify .
 
 # Query an existing graph without rebuilding it
 graphify query "How does the retrieval pipeline work?"
+
+# Explore relationships between two concepts/files
+graphify path "pipeline" "retriever"
+
+# Get a focused explanation of a concept
+graphify explain "RAGEvent"
+
+# Incrementally refresh the graph after code changes (AST-only, no LLM cost)
+graphify update .
 ```
+
+When `graphify-out/graph.json` exists, prefer these commands over broad
+source-file browsing; they return a scoped subgraph that is usually much
+smaller than `GRAPH_REPORT.md` or raw grep output. See `CLAUDE.md` for the
+project's graphify usage rules.
 
 If `graphify` is not installed, the application can still be launched, but
 repository graph navigation and graph regeneration are unavailable.

@@ -25,6 +25,7 @@ from rag_learn.eval.tracing import JSONLEmitter, RAGEvent
 from rag_learn.llm import DeepSeekLLM
 from rag_learn.pipeline import answer_stream
 from rag_learn.rate_limit import RateLimiter
+from rag_learn.reranker import build_reranker
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,8 @@ def _process_row(
     emitter: JSONLEmitter,
     metadata: dict[str, Any],
     k: int,
+    reranker: Any,
+    config: Any,
 ) -> None:
     question, collection_slug, ground_truth = parse_csv_row(row, default_collection)
     if question is None or collection_slug is None:
@@ -97,6 +100,8 @@ def _process_row(
             k=k,
             emitter=None,
             metadata=metadata,
+            reranker=reranker,
+            config=config,
         )
     except Exception as exc:  # noqa: BLE001
         logger.error("answer_stream failed for question %r: %s", question, exc)
@@ -142,8 +147,13 @@ def run_qa_csv(
     config = load_config()
     catalog = _load_catalog()
     llm = _make_llm(config)
+    reranker = build_reranker(config)
     emitter = JSONLEmitter(output_events.parent, file_name=output_events.name)
-    metadata = {"llm_model": config.llm_model}
+    metadata = {
+        "llm_model": config.llm_model,
+        "rerank_enabled": config.rerank_enabled,
+        "rerank_model": config.rerank_model if config.rerank_enabled else None,
+    }
 
     limiter = RateLimiter(
         max_concurrency=max_concurrency,
@@ -175,6 +185,8 @@ def run_qa_csv(
                     emitter,
                     metadata,
                     config.retrieve_k,
+                    reranker,
+                    config,
                 )
                 processed_count += 1
             except Exception as exc:  # noqa: BLE001

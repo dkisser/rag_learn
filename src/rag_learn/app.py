@@ -18,6 +18,7 @@ from rag_learn.eval import JSONLEmitter
 from rag_learn.llm import DeepSeekLLM
 from rag_learn.perf import StreamPerf
 from rag_learn.pipeline import answer_stream
+from rag_learn.reranker import build_reranker
 from rag_learn.retriever import Hit
 
 # from rag_learn.retriever.milvus_impl import MilvusRetriever
@@ -58,6 +59,7 @@ def build_app(
     llm: Any,
     config: Config,
     warnings: list[tuple[str, str]] | None = None,
+    reranker: Any = None,
 ) -> gr.Blocks:
     """Construct the Gradio UI but do not launch it.
 
@@ -67,6 +69,7 @@ def build_app(
         config: Application config for display metadata.
         warnings: Optional list of (collection_name, error_message) for
             collections that failed ingest during startup.
+        reranker: Optional reranker to refine retrieval results.
     """
     emitter = JSONLEmitter(config.data_dir)
 
@@ -78,10 +81,11 @@ def build_app(
             warn_md = "\n".join(f"- **{name}**: {msg}" for name, msg in warnings)
             gr.Markdown(f"⚠ **启动期集合 ingest 失败**：\n\n{warn_md}")
 
+        rerank_status = f"Rerank: `{config.rerank_model}`" if reranker else "Rerank: off"
         gr.Markdown(
             f"# RAG 多集合问答\n\n"
             f"模型：`{config.llm_model}` · Top-k: `{config.retrieve_k}` · "
-            f"Chunk: `{config.chunk_size}` chars\n\n"
+            f"Chunk: `{config.chunk_size}` chars · {rerank_status}\n\n"
             "选择知识库 → 输入问题 → 流式生成回答。"
         )
         with gr.Row():
@@ -141,7 +145,13 @@ def build_app(
                     q,
                     k=config.retrieve_k,
                     emitter=emitter,
-                    metadata={"llm_model": config.llm_model},
+                    metadata={
+                        "llm_model": config.llm_model,
+                        "rerank_enabled": config.rerank_enabled,
+                        "rerank_model": config.rerank_model if config.rerank_enabled else None,
+                    },
+                    reranker=reranker,
+                    config=config,
                 )
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
@@ -241,11 +251,16 @@ def launch() -> None:
     if not working.names():
         raise SystemExit("所有 collection ingest 失败，无法启动")
 
+    reranker = build_reranker(config)
+    if reranker:
+        logger.info("Reranker enabled: %s", config.rerank_model)
+
     app = build_app(
         catalog=working,
         llm=llm,
         config=config,
         warnings=raw_warnings,
+        reranker=reranker,
     )
     # Disable Gradio's analytics daemon — see CLAUDE.md macOS ARM note.
     os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")

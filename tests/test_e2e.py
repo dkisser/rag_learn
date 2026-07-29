@@ -75,6 +75,12 @@ def _make_config(tmp_path: Path) -> Config:
         data_dir=tmp_path / "data",
         chroma_dir=tmp_path / "data" / "chroma",
         milvus_path=tmp_path / "data" / "milvus.db",
+        rerank_enabled=False,
+        rerank_model="BAAI/bge-reranker-base",
+        rerank_factor=4,
+        rerank_k=None,
+        rerank_batch_size=8,
+        rerank_device=None,
     )
 
 

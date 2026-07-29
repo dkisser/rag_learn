@@ -33,6 +33,12 @@ class Config:
     data_dir: Path
     chroma_dir: Path
     milvus_path: Path
+    rerank_enabled: bool
+    rerank_model: str
+    rerank_factor: int
+    rerank_k: int | None
+    rerank_batch_size: int
+    rerank_device: str | None
 
 
 def _repo_root() -> Path:
@@ -50,17 +56,25 @@ def _repo_root() -> Path:
     )
 
 
+def _parse_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
 def load_config() -> Config:
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
         raise ConfigError("DEEPSEEK_API_KEY is required. Copy .env.example to .env and set it.")
 
     repo_root = _repo_root()
+    rerank_k_raw = os.environ.get("RERANK_K")
+    rerank_device = os.environ.get("RERANK_DEVICE", "auto")
     return Config(
         deepseek_api_key=api_key,
         llm_model=os.environ.get("LLM_MODEL", "deepseek-v4-flash"),
         deepseek_base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-        retrieve_k=int(os.environ.get("RETRIEVE_K", "8")),
+        retrieve_k=int(os.environ.get("RETRIEVE_K", "5")),
         chunk_size=int(os.environ.get("CHUNK_SIZE", "800")),
         chunk_overlap=int(os.environ.get("CHUNK_OVERLAP", "50")),
         repo_root=repo_root,
@@ -68,4 +82,10 @@ def load_config() -> Config:
         data_dir=repo_root / "data",
         chroma_dir=repo_root / "data" / "chroma",
         milvus_path=repo_root / "data" / "milvus.db",
+        rerank_enabled=_parse_bool(os.environ.get("RERANK_ENABLED"), False),
+        rerank_model=os.environ.get("RERANK_MODEL", "BAAI/bge-reranker-base"),
+        rerank_factor=int(os.environ.get("RERANK_FACTOR", "4")),
+        rerank_k=int(rerank_k_raw) if rerank_k_raw is not None else None,
+        rerank_batch_size=int(os.environ.get("RERANK_BATCH_SIZE", "8")),
+        rerank_device=rerank_device if rerank_device.strip() else None,
     )

@@ -42,7 +42,7 @@ def test_run_qa_csv_produces_events_and_report(
 
     monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
 
-    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None):
+    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None, **kwargs):
         from rag_learn.eval.tracing import RAGEvent
         from rag_learn.perf import StreamPerf
         from rag_learn.retriever import Hit
@@ -188,7 +188,7 @@ def test_run_qa_csv_skips_already_emitted_questions_on_resume(
 
     processed: list[str] = []
 
-    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None):
+    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None, **kwargs):
         processed.append(question)
         from rag_learn.eval.tracing import RAGEvent
         from rag_learn.perf import StreamPerf
@@ -292,7 +292,7 @@ def test_run_qa_csv_reprocesses_when_resume_disabled(
 
     processed: list[str] = []
 
-    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None):
+    def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None, **kwargs):
         processed.append(question)
         from rag_learn.eval.tracing import RAGEvent
         from rag_learn.perf import StreamPerf
@@ -348,8 +348,60 @@ def test_run_qa_csv_reprocesses_when_resume_disabled(
     assert processed == ["Q"]
 
 
-def test_run_qa_csv_invokes_rate_limiter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """run_qa_csv wraps _process_row in limiter.call()."""
+def test_run_qa_csv_passes_reranker_and_config_to_answer_stream(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
+
+    class FakeRetriever:
+        pass
+
+    class FakeCollection:
+        retriever = FakeRetriever()
+
+    class FakeCatalog:
+        def get(self, name: str):
+            return FakeCollection()
+
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+
+    captured: dict[str, object] = {}
+
+    def fake_answer_stream(*args, **kwargs):
+        captured["reranker"] = kwargs.get("reranker")
+        captured["config"] = kwargs.get("config")
+        captured["metadata"] = kwargs.get("metadata")
+        return {}
+
+    monkeypatch.setattr("rag_learn.eval.runner.answer_stream", fake_answer_stream)
+    monkeypatch.setattr(batch_module, "_make_judge_fn", lambda _config, _model: lambda s, u: "3")
+
+    csv_path = tmp_path / "qa.csv"
+    _write_csv(
+        csv_path,
+        [
+            {
+                "question": "Q",
+                "answer": "",
+                "source_files": "",
+                "chunk_ids": "",
+                "collection": "rag_doc",
+            }
+        ],
+    )
+    rc = run_qa_csv(csv_path, None, tmp_path / "batch_events.jsonl", tmp_path / "report.json")
+    assert rc == 0
+    assert captured["config"] is not None
+    assert captured["metadata"] == {
+        "llm_model": captured["config"].llm_model,
+        "rerank_enabled": captured["config"].rerank_enabled,
+        "rerank_model": captured["config"].rerank_model
+        if captured["config"].rerank_enabled
+        else None,
+    }
+
+
+def test_run_qa_csv_passes_limiter_args(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "dummy")
 
     class FakeRetriever:

@@ -28,6 +28,12 @@ def _make_config(tmp_path: Path) -> Config:
         data_dir=tmp_path / "data",
         chroma_dir=tmp_path / "data" / "chroma",
         milvus_path=tmp_path / "data" / "milvus.db",
+        rerank_enabled=False,
+        rerank_model="BAAI/bge-reranker-base",
+        rerank_factor=4,
+        rerank_k=None,
+        rerank_batch_size=8,
+        rerank_device=None,
     )
 
 
@@ -261,9 +267,10 @@ def test_launch_filters_failed_collections(monkeypatch: pytest.MonkeyPatch, tmp_
 
     built = {}
 
-    def fake_build_app(catalog, llm, config, warnings=None):  # type: ignore[no-untyped-def]
+    def fake_build_app(catalog, llm, config, warnings=None, reranker=None):  # type: ignore[no-untyped-def]
         built["catalog_names"] = catalog.names()
         built["warnings"] = warnings or []
+        built["reranker"] = reranker
         return gr.Blocks()  # empty Blocks is fine for this test
 
     monkeypatch.setattr(app_module, "build_app", fake_build_app)

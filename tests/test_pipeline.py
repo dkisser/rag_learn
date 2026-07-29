@@ -1,5 +1,7 @@
 from collections.abc import Iterator
+from pathlib import Path
 
+from rag_learn.config import Config
 from rag_learn.eval.tracing import ListEmitter, RAGEvent
 from rag_learn.perf import StreamPerf
 from rag_learn.pipeline import answer_stream, build_prompt
@@ -54,12 +56,26 @@ def test_build_prompt_numbering_starts_at_one():
 class _FakeRetriever:
     def __init__(self, hits: list[Hit]) -> None:
         self._hits = hits
+        self.last_k: int | None = None
 
     def ensure_indexed(self, docs_dir: str) -> None:
         return None
 
     def search(self, query: str, k: int = 5) -> list[Hit]:
+        self.last_k = k
         return self._hits
+
+
+class _FakeReranker:
+    def __init__(self, scores: dict[str, float]) -> None:
+        self._scores = scores
+
+    def rank(self, query: str, hits: list[Hit]) -> list[Hit]:
+        return sorted(
+            hits,
+            key=lambda h: self._scores.get(h.text, 0.0),
+            reverse=True,
+        )
 
 
 class _FakeLLM:
@@ -111,3 +127,80 @@ def test_answer_stream_no_emitter_does_not_record() -> None:
     perf = perf_fn(answer)
 
     assert isinstance(perf, StreamPerf)
+
+
+def test_answer_stream_reranker_reorders_and_truncates_to_k() -> None:
+    hits = [
+        Hit(text="irrelevant", source_file="generic.md", chunk_index=0, score=0.1),
+        Hit(text="relevant", source_file="target.md", chunk_index=1, score=0.5),
+        Hit(text="also relevant", source_file="target.md", chunk_index=2, score=0.4),
+    ]
+    retriever = _FakeRetriever(hits)
+    llm = _FakeLLM(["ok"])
+    reranker = _FakeReranker({"relevant": 1.0, "also relevant": 0.8, "irrelevant": 0.0})
+
+    out = answer_stream(
+        {"chroma": retriever},
+        llm,
+        "Q?",
+        k=1,
+        reranker=reranker,
+    )
+    _, final_hits, _ = out["chroma"]
+    assert len(final_hits) == 1
+    assert final_hits[0].text == "relevant"
+
+
+def test_answer_stream_with_config_over_fetches_candidates() -> None:
+    hits = [
+        Hit(text="a", source_file="a.md", chunk_index=0, score=0.1),
+        Hit(text="b", source_file="b.md", chunk_index=1, score=0.2),
+        Hit(text="c", source_file="c.md", chunk_index=2, score=0.3),
+        Hit(text="d", source_file="d.md", chunk_index=3, score=0.4),
+    ]
+    retriever = _FakeRetriever(hits)
+    llm = _FakeLLM(["ok"])
+    config = Config(
+        deepseek_api_key="k",
+        llm_model="m",
+        deepseek_base_url="u",
+        retrieve_k=2,
+        chunk_size=800,
+        chunk_overlap=50,
+        repo_root=Path(__file__).parent.parent / "src",
+        docs_dir=Path(__file__).parent.parent / "docs" / "rag_doc",
+        data_dir=Path(__file__).parent.parent / "data",
+        chroma_dir=Path(__file__).parent.parent / "data" / "chroma",
+        milvus_path=Path(__file__).parent.parent / "data" / "milvus.db",
+        rerank_enabled=True,
+        rerank_model="BAAI/bge-reranker-base",
+        rerank_factor=2,
+        rerank_k=None,
+        rerank_batch_size=8,
+        rerank_device=None,
+    )
+
+    out = answer_stream(
+        {"chroma": retriever},
+        llm,
+        "Q?",
+        k=2,
+        config=config,
+    )
+    _ = "".join(out["chroma"][0])
+    assert retriever.last_k == 4  # k * factor
+    assert len(out["chroma"][1]) == 2  # but prompt only sees final_k
+
+
+def test_answer_stream_no_reranker_uses_vector_order() -> None:
+    hits = [
+        Hit(text="first", source_file="a.md", chunk_index=0, score=0.1),
+        Hit(text="second", source_file="b.md", chunk_index=1, score=0.2),
+    ]
+    retriever = _FakeRetriever(hits)
+    llm = _FakeLLM(["ok"])
+
+    out = answer_stream({"chroma": retriever}, llm, "Q?", k=2)
+    _, final_hits, _ = out["chroma"]
+    assert [h.text for h in final_hits] == ["first", "second"]
+    assert retriever.last_k == 2

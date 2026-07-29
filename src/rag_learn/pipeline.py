@@ -28,8 +28,10 @@ from rag_learn.perf import StreamPerf
 from rag_learn.retriever import Hit
 
 if TYPE_CHECKING:
+    from rag_learn.config import Config
     from rag_learn.eval.tracing import MetricsEmitter
     from rag_learn.llm import DeepSeekLLM
+    from rag_learn.reranker.base import Reranker
     from rag_learn.retriever.base import BaseRetriever
 
 logger = logging.getLogger(__name__)
@@ -45,8 +47,10 @@ logger = logging.getLogger(__name__)
 #     "你是一个 RAG 助手。当前没有检索到任何相关上下文，"
 #     "请直接告诉用户「未找到相关上下文」，不要使用先验知识或编造内容。"
 # )
-SYSTEM_PROMPT = ("你是一个 RAG 助手。参考下方提供的「上下文」回答用户问题。"
-                 "如果遇到跟商品售卖相关的不确定信息，可以尝试回答，但必须强调一切以人工客服回答为准，建议用户转人工去咨询")
+SYSTEM_PROMPT = (
+    "你是一个 RAG 助手。逐条阅读「上下文」回答用户问题。"
+    "如果遇到跟商品售卖相关的不确定信息，可以尝试回答，但必须强调一切以人工客服回答为准，建议用户转人工去咨询"
+)
 
 EMPTY_HITS_SYSTEM_PROMPT = "你是一个 RAG 助手。"
 
@@ -83,11 +87,34 @@ def _make_perf(
     )
 
 
-def _retrieve(retrievers: dict[str, BaseRetriever], question: str, k: int) -> dict[str, list[Hit]]:
-    """Run all retrievers in parallel (threads); return their Hits per side."""
+def _candidate_k(final_k: int, config: Config | None) -> int:
+    """Compute how many candidates to fetch before optional reranking."""
+    if config is None or not config.rerank_enabled:
+        return final_k
+    if config.rerank_k is not None:
+        return max(final_k, config.rerank_k)
+    return max(final_k, final_k * config.rerank_factor)
+
+
+def _retrieve(
+    retrievers: dict[str, BaseRetriever],
+    question: str,
+    final_k: int,
+    candidate_k: int,
+    reranker: Reranker | None = None,
+) -> dict[str, list[Hit]]:
+    """Run all retrievers in parallel (threads); return their Hits per side.
+
+    Each retriever fetches ``candidate_k`` hits. If a reranker is provided, the
+    candidates are re-scored and truncated back to ``final_k`` before being
+    returned and fed into the prompt.
+    """
 
     def _one(name: str) -> tuple[str, list[Hit]]:
-        return name, retrievers[name].search(question, k=k)
+        hits = retrievers[name].search(question, k=candidate_k)
+        if reranker is not None:
+            hits = reranker.rank(question, hits)
+        return name, hits[:final_k]
 
     results: dict[str, list[Hit]] = {}
     with ThreadPoolExecutor(max_workers=max(2, len(retrievers))) as ex:
@@ -105,6 +132,8 @@ def answer_stream(
     k: int = 5,
     emitter: MetricsEmitter | None = None,
     metadata: dict[str, Any] | None = None,
+    reranker: Reranker | None = None,
+    config: Config | None = None,
 ) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]]:
     """Parallel retrieve → build prompt per side → stream tokens per side.
 
@@ -116,7 +145,10 @@ def answer_stream(
     """
     event_metadata = metadata or {}
     retrieve_started = time.perf_counter()
-    hits_by_side = _retrieve(retrievers, question, k)
+    candidate_k = _candidate_k(k, config)
+    hits_by_side = _retrieve(
+        retrievers, question, final_k=k, candidate_k=candidate_k, reranker=reranker
+    )
     retrieve_ms = (time.perf_counter() - retrieve_started) * 1000.0
 
     def _side(
