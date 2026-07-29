@@ -60,7 +60,7 @@ def load_config() -> Config:
         deepseek_api_key=api_key,
         llm_model=os.environ.get("LLM_MODEL", "deepseek-v4-flash"),
         deepseek_base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-        retrieve_k=int(os.environ.get("RETRIEVE_K", "5")),
+        retrieve_k=int(os.environ.get("RETRIEVE_K", "8")),
         chunk_size=int(os.environ.get("CHUNK_SIZE", "800")),
         chunk_overlap=int(os.environ.get("CHUNK_OVERLAP", "50")),
         repo_root=repo_root,

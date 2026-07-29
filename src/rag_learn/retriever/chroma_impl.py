@@ -19,7 +19,7 @@ class ChromaRetriever:
         self._client = chromadb.PersistentClient(path=str(persist_dir))
         self._collection = self._client.get_or_create_collection(
             name=collection_name,
-            metadata={"hnsw:space": "l2"},
+            metadata={"hnsw:space": "cosine"},
         )
 
     def ensure_indexed(self, docs_dir: str) -> None:
