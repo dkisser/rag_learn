@@ -39,6 +39,8 @@ class Config:
     rerank_k: int | None
     rerank_batch_size: int
     rerank_device: str | None
+    hybrid_enabled: bool
+    hybrid_rrf_k: int
 
 
 def _repo_root() -> Path:
@@ -88,4 +90,6 @@ def load_config() -> Config:
         rerank_k=int(rerank_k_raw) if rerank_k_raw is not None else None,
         rerank_batch_size=int(os.environ.get("RERANK_BATCH_SIZE", "8")),
         rerank_device=rerank_device if rerank_device.strip() else None,
+        hybrid_enabled=_parse_bool(os.environ.get("HYBRID_ENABLED"), False),
+        hybrid_rrf_k=int(os.environ.get("HYBRID_RRF_K", "60")),
     )

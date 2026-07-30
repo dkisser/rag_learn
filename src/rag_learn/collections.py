@@ -20,9 +20,9 @@ PERSIST_DIR_SEGMENTS = ("data", "chroma")
 
 def _default_factory(persist_dir: Path, name: str) -> BaseRetriever:
     # Imported lazily so this module stays cheap when only Collection is used.
-    from rag_learn.retriever.chroma_impl import ChromaRetriever
+    from rag_learn.retriever.factory import build_retriever
 
-    return ChromaRetriever(persist_dir=persist_dir, collection_name=name)
+    return build_retriever(persist_dir=persist_dir, collection_name=name)
 
 
 @dataclass(frozen=True)
@@ -119,22 +119,44 @@ class Catalog:
         return warnings
 
 
-def _build_builtin() -> tuple[Collection, ...]:
+def _make_factory(
+    *, hybrid_enabled: bool, hybrid_rrf_k: int
+) -> Callable[[Path, str], BaseRetriever]:
+    """Build a retriever factory that captures the hybrid config."""
+    from rag_learn.retriever.factory import build_retriever
+
+    def _factory(persist_dir: Path, name: str) -> BaseRetriever:
+        return build_retriever(
+            persist_dir=persist_dir,
+            collection_name=name,
+            hybrid_enabled=hybrid_enabled,
+            hybrid_rrf_k=hybrid_rrf_k,
+        )
+
+    return _factory
+
+
+def _build_builtin(
+    *, hybrid_enabled: bool = False, hybrid_rrf_k: int = 60
+) -> tuple[Collection, ...]:
     from rag_learn.config import _repo_root
 
     root = _repo_root() / "docs"
+    factory = _make_factory(hybrid_enabled=hybrid_enabled, hybrid_rrf_k=hybrid_rrf_k)
     return (
         Collection(
             name="rag_doc",
             display_name="RAG 论文集",
             docs_dir=root / "rag_doc",
             description="25 篇 RAG 相关论文 / 综述 / 实践文章",
+            retriever_factory=factory,
         ),
         Collection(
             name="shanzhongshi",
             display_name="山中事咖啡",
             docs_dir=root / "shanzhongshi",
             description="山中事咖啡（SHAN.IN COFFEE）的豆子参数、冲煮教程与公司信息",
+            retriever_factory=factory,
         ),
     )
 
@@ -142,5 +164,8 @@ def _build_builtin() -> tuple[Collection, ...]:
 BUILTIN_COLLECTIONS: tuple[Collection, ...] = _build_builtin()
 
 
-def build_catalog() -> Catalog:
-    return Catalog(collections=BUILTIN_COLLECTIONS)
+def build_catalog(hybrid_enabled: bool = False, hybrid_rrf_k: int = 60) -> Catalog:
+    """Build the default catalog, optionally wiring hybrid retrieval."""
+    return Catalog(
+        collections=_build_builtin(hybrid_enabled=hybrid_enabled, hybrid_rrf_k=hybrid_rrf_k)
+    )

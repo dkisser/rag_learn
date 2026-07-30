@@ -26,7 +26,7 @@ def test_cli_run_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
 
     def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None, **kwargs):
         from rag_learn.eval.tracing import RAGEvent

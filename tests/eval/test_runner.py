@@ -40,7 +40,7 @@ def test_run_qa_csv_produces_events_and_report(
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
 
     def fake_answer_stream(retrievers, llm, question, k=5, emitter=None, metadata=None, **kwargs):
         from rag_learn.eval.tracing import RAGEvent
@@ -184,7 +184,7 @@ def test_run_qa_csv_skips_already_emitted_questions_on_resume(
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
 
     processed: list[str] = []
 
@@ -288,7 +288,7 @@ def test_run_qa_csv_reprocesses_when_resume_disabled(
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
 
     processed: list[str] = []
 
@@ -363,7 +363,7 @@ def test_run_qa_csv_passes_reranker_and_config_to_answer_stream(
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
 
     captured: dict[str, object] = {}
 
@@ -398,6 +398,10 @@ def test_run_qa_csv_passes_reranker_and_config_to_answer_stream(
         "rerank_model": captured["config"].rerank_model
         if captured["config"].rerank_enabled
         else None,
+        "hybrid_enabled": captured["config"].hybrid_enabled,
+        "hybrid_rrf_k": captured["config"].hybrid_rrf_k
+        if captured["config"].hybrid_enabled
+        else None,
     }
 
 
@@ -414,7 +418,7 @@ def test_run_qa_csv_passes_limiter_args(tmp_path: Path, monkeypatch: pytest.Monk
         def get(self, name: str):
             return FakeCollection()
 
-    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda: FakeCatalog())
+    monkeypatch.setattr("rag_learn.eval.runner._load_catalog", lambda _config: FakeCatalog())
     monkeypatch.setattr("rag_learn.eval.runner.answer_stream", lambda *a, **k: {})
 
     captured: dict[str, object] = {}

@@ -81,6 +81,8 @@ def _make_config(tmp_path: Path) -> Config:
         rerank_k=None,
         rerank_batch_size=8,
         rerank_device=None,
+        hybrid_enabled=False,
+        hybrid_rrf_k=60,
     )
 
 

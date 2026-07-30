@@ -178,6 +178,8 @@ def test_answer_stream_with_config_over_fetches_candidates() -> None:
         rerank_k=None,
         rerank_batch_size=8,
         rerank_device=None,
+        hybrid_enabled=False,
+        hybrid_rrf_k=60,
     )
 
     out = answer_stream(

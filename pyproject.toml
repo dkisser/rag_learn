@@ -30,6 +30,8 @@ dependencies = [
     # have stable APIs in the pinned major versions.
     "pyrate-limiter>=3,<5",
     "tenacity>=9,<10",
+    "jieba>=0.42.1",
+    "rank-bm25>=0.2.2",
 ]
 
 [project.optional-dependencies]

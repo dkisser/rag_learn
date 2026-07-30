@@ -30,8 +30,11 @@ from rag_learn.reranker import build_reranker
 logger = logging.getLogger(__name__)
 
 
-def _load_catalog() -> Catalog:
-    return build_catalog()
+def _load_catalog(config: Any) -> Catalog:
+    return build_catalog(
+        hybrid_enabled=config.hybrid_enabled,
+        hybrid_rrf_k=config.hybrid_rrf_k,
+    )
 
 
 def _make_llm(config: Any) -> DeepSeekLLM:
@@ -145,7 +148,7 @@ def run_qa_csv(
 ) -> int:
     """Read a Q&A CSV, run each question through RAG, emit events, and evaluate."""
     config = load_config()
-    catalog = _load_catalog()
+    catalog = _load_catalog(config)
     llm = _make_llm(config)
     reranker = build_reranker(config)
     emitter = JSONLEmitter(output_events.parent, file_name=output_events.name)
@@ -153,6 +156,8 @@ def run_qa_csv(
         "llm_model": config.llm_model,
         "rerank_enabled": config.rerank_enabled,
         "rerank_model": config.rerank_model if config.rerank_enabled else None,
+        "hybrid_enabled": config.hybrid_enabled,
+        "hybrid_rrf_k": config.hybrid_rrf_k if config.hybrid_enabled else None,
     }
 
     limiter = RateLimiter(

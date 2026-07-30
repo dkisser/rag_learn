@@ -34,6 +34,8 @@ def _make_config(tmp_path: Path) -> Config:
         rerank_k=None,
         rerank_batch_size=8,
         rerank_device=None,
+        hybrid_enabled=False,
+        hybrid_rrf_k=60,
     )
 
 
@@ -276,7 +278,9 @@ def test_launch_filters_failed_collections(monkeypatch: pytest.MonkeyPatch, tmp_
     monkeypatch.setattr(app_module, "build_app", fake_build_app)
     monkeypatch.setattr(app_module, "load_config", lambda: config)
     monkeypatch.setattr(app_module, "DeepSeekLLM", lambda **_kw: fake_llm)
-    monkeypatch.setattr(app_module, "build_catalog", lambda: catalog)
+    monkeypatch.setattr(
+        app_module, "build_catalog", lambda hybrid_enabled=False, hybrid_rrf_k=60: catalog
+    )
 
     app_module.launch()
 
@@ -318,7 +322,9 @@ def test_launch_exits_when_all_collections_fail(monkeypatch: pytest.MonkeyPatch,
 
     monkeypatch.setattr(app_module, "load_config", lambda: config)
     monkeypatch.setattr(app_module, "DeepSeekLLM", lambda **_kw: _stub_llm())
-    monkeypatch.setattr(app_module, "build_catalog", lambda: catalog)
+    monkeypatch.setattr(
+        app_module, "build_catalog", lambda hybrid_enabled=False, hybrid_rrf_k=60: catalog
+    )
 
     with pytest.raises(SystemExit, match="所有 collection ingest 失败"):
         app_module.launch()

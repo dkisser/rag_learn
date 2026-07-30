@@ -11,7 +11,9 @@ class Hit:
     text: str  # chunk content
     source_file: str  # e.g. "18-graphrag.md"
     chunk_index: int  # index within source file
-    score: float  # L2 distance; lower = more similar
+    score: float  # relevance score; semantics depend on retriever
+    # Vector retrievers report L2/cosine distance (lower = more similar).
+    # BM25 and Hybrid (RRF) retrievers report a higher-is-better score.
 
 
 @runtime_checkable

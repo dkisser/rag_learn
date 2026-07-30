@@ -33,7 +33,7 @@ def _format_chunks(hits: list[Hit]) -> str:
     for i, h in enumerate(hits, start=1):
         snippet = (h.text[:200] + "…") if len(h.text) > 200 else h.text
         lines.append(
-            f"**[{i}]** `{h.source_file}#{h.chunk_index}` (dist={h.score:.4f})\n\n{snippet}\n\n---"
+            f"**[{i}]** `{h.source_file}#{h.chunk_index}` (score={h.score:.4f})\n\n{snippet}\n\n---"
         )
     return "\n\n".join(lines)
 
@@ -82,10 +82,13 @@ def build_app(
             gr.Markdown(f"⚠ **启动期集合 ingest 失败**：\n\n{warn_md}")
 
         rerank_status = f"Rerank: `{config.rerank_model}`" if reranker else "Rerank: off"
+        hybrid_status = (
+            f"Hybrid: on (RRF k={config.hybrid_rrf_k})" if config.hybrid_enabled else "Hybrid: off"
+        )
         gr.Markdown(
             f"# RAG 多集合问答\n\n"
             f"模型：`{config.llm_model}` · Top-k: `{config.retrieve_k}` · "
-            f"Chunk: `{config.chunk_size}` chars · {rerank_status}\n\n"
+            f"Chunk: `{config.chunk_size}` chars · {rerank_status} · {hybrid_status}\n\n"
             "选择知识库 → 输入问题 → 流式生成回答。"
         )
         with gr.Row():
@@ -149,6 +152,8 @@ def build_app(
                         "llm_model": config.llm_model,
                         "rerank_enabled": config.rerank_enabled,
                         "rerank_model": config.rerank_model if config.rerank_enabled else None,
+                        "hybrid_enabled": config.hybrid_enabled,
+                        "hybrid_rrf_k": config.hybrid_rrf_k if config.hybrid_enabled else None,
                     },
                     reranker=reranker,
                     config=config,
@@ -236,7 +241,10 @@ def launch() -> None:
         base_url=config.deepseek_base_url,
     )
 
-    catalog = build_catalog()
+    catalog = build_catalog(
+        hybrid_enabled=config.hybrid_enabled,
+        hybrid_rrf_k=config.hybrid_rrf_k,
+    )
     logger.info("Catalog: %d collections %s", len(catalog.collections), catalog.names())
     raw_warnings = catalog.ensure_all_indexed()
     failed_names = {name for name, _ in raw_warnings}

@@ -7,6 +7,8 @@ def test_load_config_reads_required_key(monkeypatch):
     monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-test")
     monkeypatch.delenv("RERANK_ENABLED", raising=False)
     monkeypatch.delenv("RETRIEVE_K", raising=False)
+    monkeypatch.delenv("HYBRID_ENABLED", raising=False)
+    monkeypatch.delenv("HYBRID_RRF_K", raising=False)
     cfg = load_config()
     assert cfg.deepseek_api_key == "sk-test"
     assert cfg.llm_model == "deepseek-v4-flash"  # default
@@ -41,6 +43,8 @@ def test_load_config_rerank_defaults(monkeypatch):
     monkeypatch.delenv("RERANK_FACTOR", raising=False)
     monkeypatch.delenv("RERANK_BATCH_SIZE", raising=False)
     monkeypatch.delenv("RERANK_DEVICE", raising=False)
+    monkeypatch.delenv("HYBRID_ENABLED", raising=False)
+    monkeypatch.delenv("HYBRID_RRF_K", raising=False)
     cfg = load_config()
     assert cfg.rerank_enabled is False
     assert cfg.rerank_model == "BAAI/bge-reranker-base"
@@ -48,6 +52,17 @@ def test_load_config_rerank_defaults(monkeypatch):
     assert cfg.rerank_k is None
     assert cfg.rerank_batch_size == 8
     assert cfg.rerank_device == "auto"
+    assert cfg.hybrid_enabled is False
+    assert cfg.hybrid_rrf_k == 60
+
+
+def test_load_config_hybrid_overrides(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("HYBRID_ENABLED", "true")
+    monkeypatch.setenv("HYBRID_RRF_K", "30")
+    cfg = load_config()
+    assert cfg.hybrid_enabled is True
+    assert cfg.hybrid_rrf_k == 30
 
 
 def test_load_config_rerank_overrides(monkeypatch):
