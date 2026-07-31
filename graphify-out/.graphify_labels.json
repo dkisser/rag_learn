@@ -29,5 +29,9 @@
   "27": "doc_beans.md",
   "28": "doc_with_h1.md",
   "29": "doc_short_section.md",
-  "30": "doc_no_h1.md"
+  "30": "doc_no_h1.md",
+  "31": "RateLimiter",
+  "32": "loader.py",
+  "33": "BM25Index",
+  "34": "conftest.py"
 }

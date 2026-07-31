@@ -105,6 +105,7 @@ def _process_row(
             metadata=metadata,
             reranker=reranker,
             config=config,
+            catalog=catalog,
         )
     except Exception as exc:  # noqa: BLE001
         logger.error("answer_stream failed for question %r: %s", question, exc)

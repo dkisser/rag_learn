@@ -36,6 +36,12 @@ def _make_config(tmp_path: Path) -> Config:
         rerank_device=None,
         hybrid_enabled=False,
         hybrid_rrf_k=60,
+        intent_enabled=False,
+        intent_timeout_s=8.0,
+        decompose_enabled=False,
+        decompose_timeout_s=15.0,
+        decompose_max=8,
+        catalog_recall_k=20,
     )
 
 
@@ -211,7 +217,9 @@ def test_build_app_logs_event_to_jsonl(stub_catalog: Catalog, tmp_path: Path):
 
     submit_fn = app.fns[0].fn
     outputs = submit_fn("aaa", "hello")
-    assert isinstance(outputs, list) and len(outputs) == 5
+    assert (
+        isinstance(outputs, list) and len(outputs) == 6
+    )  # q, desc_md, routing_md, bot, chunks_md, perf_md
 
     files = list(tmp_path.glob("data/rag_events_*.jsonl"))
     assert len(files) == 1

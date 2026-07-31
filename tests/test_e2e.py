@@ -83,6 +83,12 @@ def _make_config(tmp_path: Path) -> Config:
         rerank_device=None,
         hybrid_enabled=False,
         hybrid_rrf_k=60,
+        intent_enabled=False,
+        intent_timeout_s=8.0,
+        decompose_enabled=False,
+        decompose_timeout_s=15.0,
+        decompose_max=8,
+        catalog_recall_k=20,
     )
 
 
@@ -181,8 +187,8 @@ def test_e2e_build_app_collection_selection_changes_chunks(tmp_path: Path):
     submit_fn = app.fns[0].fn
     for slug in ("aaa", "bbb"):
         outputs = submit_fn(slug, f"question for {slug}")
-        assert isinstance(outputs, list) and len(outputs) == 5
-        chunks_md = outputs[3]
+        assert isinstance(outputs, list) and len(outputs) == 6
+        chunks_md = outputs[4]
         assert f"{slug}.md" in str(chunks_md), (
             f"selection {slug!r} should drive retrieval from that collection"
         )
@@ -196,9 +202,9 @@ def test_e2e_build_app_empty_question_clears_output(tmp_path: Path):
 
     submit_fn = app.fns[0].fn
     outputs = submit_fn("aaa", "   ")
-    assert isinstance(outputs, list) and len(outputs) == 5
+    assert isinstance(outputs, list) and len(outputs) == 6
     assert outputs[1] == ""  # desc_md cleared
-    assert outputs[2] == []  # bot empty
+    assert outputs[3] == []  # bot empty
 
 
 def test_e2e_build_app_unknown_collection_shows_warning(tmp_path: Path):
@@ -209,6 +215,6 @@ def test_e2e_build_app_unknown_collection_shows_warning(tmp_path: Path):
 
     submit_fn = app.fns[0].fn
     outputs = submit_fn("no-such-slug", "hello")
-    assert isinstance(outputs, list) and len(outputs) == 5
-    assert "未知集合" in str(outputs[2])  # bot warning
-    assert outputs[3] == "_（无召回）_"  # chunks empty
+    assert isinstance(outputs, list) and len(outputs) == 6
+    assert "未知集合" in str(outputs[3])  # bot warning
+    assert outputs[4] == "_（无召回）_"  # chunks empty

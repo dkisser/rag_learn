@@ -49,6 +49,25 @@ def _format_perf(perf: StreamPerf | None) -> str:
     )
 
 
+def _format_routing(config: Config, metadata: dict[str, Any]) -> str:
+    """Render a one-line caption summarizing routing decisions.
+
+    Reads the metadata dict that ``answer_stream`` populated in-place with
+    ``intent`` / ``sub_queries`` / ``target_collections`` / ``merged_k``.
+    Falls back to "routing disabled" when the intent classifier is off.
+    """
+    if not config.intent_enabled:
+        return "_（routing 已关闭 — 设 `INTENT_ENABLED=true` 开启）_"
+    intent = metadata.get("intent", "specific")
+    sub_q = metadata.get("sub_queries", [])
+    target = metadata.get("target_collections", [])
+    merged = metadata.get("merged_k", "?")
+    return (
+        f"intent: `{intent}` · sub-queries: `{len(sub_q)}` · "
+        f"target: `[{', '.join(target)}]` · unique hits: `{merged}`"
+    )
+
+
 def _drain_to_chatbot(stream: Iterator[str]) -> str:
     """Consume an answer_stream's iterator and return the joined text."""
     return "".join(list(stream)) or "_（无输出）_"
@@ -112,6 +131,7 @@ def build_app(
         with gr.Row():
             with gr.Column():
                 gr.Markdown("## 回答")
+                routing_md = gr.Markdown("_（routing 信息提交后展示）_")
                 bot = gr.Chatbot(label="答案", height=400, type="messages")
                 with gr.Accordion("检索到的 chunks", open=False):
                     chunks_md = gr.Markdown("_提交问题后展示_")
@@ -121,6 +141,7 @@ def build_app(
             empty_outputs: list[Any] = [
                 gr.update(value=""),
                 "",
+                "_（routing 信息提交后展示）_",
                 [],
                 "_（无召回）_",
                 _format_perf(None),
@@ -135,12 +156,20 @@ def build_app(
                 return [
                     gr.update(value=""),
                     "",
+                    "_（routing 信息提交后展示）_",
                     bot.value,
                     "_（无召回）_",
                     _format_perf(None),
                 ]
 
             retriever = collection.retriever
+            metadata: dict[str, Any] = {
+                "llm_model": config.llm_model,
+                "rerank_enabled": config.rerank_enabled,
+                "rerank_model": config.rerank_model if config.rerank_enabled else None,
+                "hybrid_enabled": config.hybrid_enabled,
+                "hybrid_rrf_k": config.hybrid_rrf_k if config.hybrid_enabled else None,
+            }
             try:
                 outputs = answer_stream(
                     {collection_slug: retriever},
@@ -148,15 +177,10 @@ def build_app(
                     q,
                     k=config.retrieve_k,
                     emitter=emitter,
-                    metadata={
-                        "llm_model": config.llm_model,
-                        "rerank_enabled": config.rerank_enabled,
-                        "rerank_model": config.rerank_model if config.rerank_enabled else None,
-                        "hybrid_enabled": config.hybrid_enabled,
-                        "hybrid_rrf_k": config.hybrid_rrf_k if config.hybrid_enabled else None,
-                    },
+                    metadata=metadata,
                     reranker=reranker,
                     config=config,
+                    catalog=catalog,
                 )
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
@@ -164,6 +188,7 @@ def build_app(
                 return [
                     gr.update(value=""),
                     collection.description,
+                    "_（routing 信息提交后展示）_",
                     bot.value,
                     "_（无召回）_",
                     _format_perf(None),
@@ -172,6 +197,9 @@ def build_app(
             bot.value = bot.value + [{"role": "user", "content": q}]
             stream_iter, hits, perf_fn = outputs[collection_slug]
             chunks_md.value = _format_chunks(hits)
+            # Render the routing caption from the metadata dict that
+            # ``answer_stream`` populated in-place.
+            routing_md.value = _format_routing(config, metadata)
             try:
                 answer_text = _drain_to_chatbot(stream_iter)
             except Exception as exc:  # noqa: BLE001 — spec §7 RetrievalError
@@ -181,6 +209,7 @@ def build_app(
                 return [
                     gr.update(value=""),
                     collection.description,
+                    routing_md.value,
                     bot.value,
                     chunks_md.value,
                     perf_md.value,
@@ -200,6 +229,7 @@ def build_app(
             return [
                 gr.update(value=""),
                 collection.description,
+                routing_md.value,
                 bot.value,
                 chunks_md.value,
                 perf_md.value,
@@ -208,7 +238,7 @@ def build_app(
         submit.click(
             on_submit,
             inputs=[collection_dd, question],
-            outputs=[question, desc_md, bot, chunks_md, perf_md],
+            outputs=[question, desc_md, routing_md, bot, chunks_md, perf_md],
         )
 
         def on_clear() -> Any:
@@ -216,6 +246,7 @@ def build_app(
             chunks_md.value = "_提交问题后展示_"
             perf_md.value = _format_perf(None)
             desc_md.value = ""
+            routing_md.value = "_（routing 信息提交后展示）_"
             return gr.update(value="")
 
         clear.click(on_clear, inputs=[], outputs=[question])

@@ -121,3 +121,38 @@ def test_paths_resolve_relative_to_repo(monkeypatch):
     assert (cfg.repo_root / "pyproject.toml").is_file()
     assert cfg.docs_dir.name == "rag_doc"
     assert cfg.data_dir.name == "data"
+
+
+def test_load_config_routing_defaults(monkeypatch):
+    """新增的 6 个 routing 字段默认值(开关默认关,其余走 dataclass 默认)."""
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.delenv("INTENT_ENABLED", raising=False)
+    monkeypatch.delenv("INTENT_TIMEOUT_S", raising=False)
+    monkeypatch.delenv("DECOMPOSE_ENABLED", raising=False)
+    monkeypatch.delenv("DECOMPOSE_TIMEOUT_S", raising=False)
+    monkeypatch.delenv("DECOMPOSE_MAX", raising=False)
+    monkeypatch.delenv("CATALOG_RECALL_K", raising=False)
+    cfg = load_config()
+    assert cfg.intent_enabled is False
+    assert cfg.intent_timeout_s == 8.0
+    assert cfg.decompose_enabled is False
+    assert cfg.decompose_timeout_s == 15.0
+    assert cfg.decompose_max == 8
+    assert cfg.catalog_recall_k == 20
+
+
+def test_load_config_routing_overrides(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("INTENT_ENABLED", "true")
+    monkeypatch.setenv("INTENT_TIMEOUT_S", "3.5")
+    monkeypatch.setenv("DECOMPOSE_ENABLED", "yes")
+    monkeypatch.setenv("DECOMPOSE_TIMEOUT_S", "9.0")
+    monkeypatch.setenv("DECOMPOSE_MAX", "5")
+    monkeypatch.setenv("CATALOG_RECALL_K", "30")
+    cfg = load_config()
+    assert cfg.intent_enabled is True
+    assert cfg.intent_timeout_s == 3.5
+    assert cfg.decompose_enabled is True
+    assert cfg.decompose_timeout_s == 9.0
+    assert cfg.decompose_max == 5
+    assert cfg.catalog_recall_k == 30

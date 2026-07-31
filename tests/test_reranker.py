@@ -106,6 +106,12 @@ class TestBuildReranker:
             rerank_device=None,
             hybrid_enabled=False,
             hybrid_rrf_k=60,
+            intent_enabled=False,
+            intent_timeout_s=8.0,
+            decompose_enabled=False,
+            decompose_timeout_s=15.0,
+            decompose_max=8,
+            catalog_recall_k=20,
         )
         assert build_reranker(config) is None
         mock_cls.assert_not_called()
@@ -136,6 +142,12 @@ class TestBuildReranker:
             rerank_device="cpu",
             hybrid_enabled=False,
             hybrid_rrf_k=60,
+            intent_enabled=False,
+            intent_timeout_s=8.0,
+            decompose_enabled=False,
+            decompose_timeout_s=15.0,
+            decompose_max=8,
+            catalog_recall_k=20,
         )
         result = build_reranker(config)
         assert result is mock_instance
@@ -172,6 +184,12 @@ class TestBuildReranker:
             rerank_device=None,
             hybrid_enabled=False,
             hybrid_rrf_k=60,
+            intent_enabled=False,
+            intent_timeout_s=8.0,
+            decompose_enabled=False,
+            decompose_timeout_s=15.0,
+            decompose_max=8,
+            catalog_recall_k=20,
         )
         with caplog.at_level("WARNING"):
             assert build_reranker(config) is None

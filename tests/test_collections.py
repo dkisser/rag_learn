@@ -143,6 +143,18 @@ def test_catalog_display_choices(fake_docs: Path):
     assert c.display_choices() == [("甲", "aaa"), ("乙", "bbb")]
 
 
+def test_catalog_iter_collections_returns_in_order(fake_docs: Path):
+    a = _make_collection("aaa", "甲", fake_docs)
+    b = _make_collection("bbb", "乙", fake_docs)
+    c = Catalog(collections=(a, b))
+    assert list(c.iter_collections()) == [a, b]
+
+
+def test_catalog_iter_collections_empty():
+    c = Catalog(collections=())
+    assert list(c.iter_collections()) == []
+
+
 def test_catalog_get_returns_matching(fake_docs: Path):
     a = _make_collection("aaa", "甲", fake_docs)
     b = _make_collection("bbb", "乙", fake_docs)

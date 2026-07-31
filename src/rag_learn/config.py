@@ -41,6 +41,12 @@ class Config:
     rerank_device: str | None
     hybrid_enabled: bool
     hybrid_rrf_k: int
+    intent_enabled: bool
+    intent_timeout_s: float
+    decompose_enabled: bool
+    decompose_timeout_s: float
+    decompose_max: int
+    catalog_recall_k: int
 
 
 def _repo_root() -> Path:
@@ -92,4 +98,10 @@ def load_config() -> Config:
         rerank_device=rerank_device if rerank_device.strip() else None,
         hybrid_enabled=_parse_bool(os.environ.get("HYBRID_ENABLED"), False),
         hybrid_rrf_k=int(os.environ.get("HYBRID_RRF_K", "60")),
+        intent_enabled=_parse_bool(os.environ.get("INTENT_ENABLED"), False),
+        intent_timeout_s=float(os.environ.get("INTENT_TIMEOUT_S", "8.0")),
+        decompose_enabled=_parse_bool(os.environ.get("DECOMPOSE_ENABLED"), False),
+        decompose_timeout_s=float(os.environ.get("DECOMPOSE_TIMEOUT_S", "15.0")),
+        decompose_max=int(os.environ.get("DECOMPOSE_MAX", "8")),
+        catalog_recall_k=int(os.environ.get("CATALOG_RECALL_K", "20")),
     )

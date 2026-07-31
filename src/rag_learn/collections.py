@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -90,6 +90,10 @@ class Catalog:
 
     def names(self) -> list[str]:
         return [c.name for c in self.collections]
+
+    def iter_collections(self) -> Iterator[Collection]:
+        """Yield each contained :class:`Collection` in declaration order."""
+        return iter(self.collections)
 
     def display_choices(self) -> list[tuple[str, str]]:
         return [(c.display_name, c.name) for c in self.collections]
