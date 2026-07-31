@@ -302,7 +302,10 @@ def answer_stream(
     fed into the catalog-recall system prompt. The reranker is NOT
     invoked in this branch.
     """
-    event_metadata: dict[str, Any] = metadata if metadata is not None else {}
+    # IMPORTANT: shallow-copy the caller's dict so routing metadata writes
+    # (intent / sub_queries / target_collections / merged_k) never mutate
+    # the caller's object. The original dict is treated as read-only input.
+    event_metadata: dict[str, Any] = dict(metadata) if metadata is not None else {}
     cfg = config
 
     # Catalog-coverage branch: classify + (optional) decompose + fan-out.
@@ -335,9 +338,7 @@ def answer_stream(
                 retrieve_ms=(time.perf_counter() - retrieve_started) * 1000.0,
                 result_key=result_key,
             )
-            if cfg.intent_enabled:
-                # always advertise intent in metadata even when not "all"
-                event_metadata.setdefault("intent", intent)
+            event_metadata["intent"] = intent
             return result
 
     # Original single-query path.
