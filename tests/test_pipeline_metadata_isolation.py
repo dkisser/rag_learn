@@ -47,6 +47,7 @@ def _make_config(intent_enabled: bool = True, decompose_enabled: bool = True) ->
         decompose_enabled=decompose_enabled,
         decompose_timeout_s=2.0,
         decompose_max=8,
+        catalog_sub_k=10,
         catalog_recall_k=10,
     )
 

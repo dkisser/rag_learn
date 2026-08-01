@@ -51,6 +51,7 @@ def make_routing_config() -> Callable[..., Config]:
             "decompose_enabled": True,
             "decompose_timeout_s": 2.0,
             "decompose_max": 8,
+            "catalog_sub_k": 10,
             "catalog_recall_k": 10,
         }
         return Config(**{**defaults, **overrides})

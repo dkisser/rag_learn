@@ -111,6 +111,7 @@ class TestBuildReranker:
             decompose_enabled=False,
             decompose_timeout_s=15.0,
             decompose_max=8,
+            catalog_sub_k=20,
             catalog_recall_k=20,
         )
         assert build_reranker(config) is None
@@ -147,6 +148,7 @@ class TestBuildReranker:
             decompose_enabled=False,
             decompose_timeout_s=15.0,
             decompose_max=8,
+            catalog_sub_k=20,
             catalog_recall_k=20,
         )
         result = build_reranker(config)
@@ -189,6 +191,7 @@ class TestBuildReranker:
             decompose_enabled=False,
             decompose_timeout_s=15.0,
             decompose_max=8,
+            catalog_sub_k=20,
             catalog_recall_k=20,
         )
         with caplog.at_level("WARNING"):

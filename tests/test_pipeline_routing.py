@@ -45,6 +45,7 @@ def _make_config(
         decompose_enabled=decompose_enabled,
         decompose_timeout_s=2.0,
         decompose_max=8,
+        catalog_sub_k=catalog_recall_k,
         catalog_recall_k=catalog_recall_k,
     )
 

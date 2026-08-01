@@ -26,7 +26,7 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal
@@ -151,9 +151,20 @@ def _retrieve(
     return results
 
 
-def _build_catalog_summary(catalog: Catalog) -> str:
-    """Render a one-line-per-collection string for the decomposer prompt."""
-    lines = [f"- {c.display_name}: {c.description}" for c in catalog.iter_collections()]
+def _build_catalog_summary(catalog: Catalog, only: Iterable[str] = ()) -> str:
+    """Render a one-line-per-collection string for the decomposer prompt.
+
+    ``only`` scopes the summary to the collections actually being searched
+    (``retrievers`` keys). Describing collections the fan-out will never
+    touch makes the decomposer emit sub-queries aimed at the wrong corpus.
+    Keys that match no collection — the legacy ``chroma``/``milvus``
+    compare mode — fall back to the whole catalog rather than an empty
+    summary.
+    """
+    wanted = set(only)
+    collections = list(catalog.iter_collections())
+    scoped = [c for c in collections if c.name in wanted] or collections
+    lines = [f"- {c.display_name}: {c.description}" for c in scoped]
     return "\n".join(lines) if lines else "(empty catalog)"
 
 
@@ -190,6 +201,7 @@ def _answer_catalog_recall(
     intent: str,
     sub_queries: list[str],
     *,
+    sub_k: int,
     final_k: int,
     emitter: MetricsEmitter | None,
     metadata: dict[str, Any],
@@ -197,10 +209,16 @@ def _answer_catalog_recall(
     result_key: str,
     routing_sink: Callable[[RoutingInfo], None] | None = None,
 ) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]]:
-    """Fan-out retrieve → round-robin merge → stream via catalog system prompt."""
+    """Fan-out retrieve → round-robin merge → stream via catalog system prompt.
+
+    ``sub_k`` bounds how many candidates EACH sub-query pulls from EACH
+    retriever; ``final_k`` bounds how many survive the merge and reach the
+    prompt. Keeping them separate lets the fan-out stay broad without
+    inflating the prompt (they used to be the same config value).
+    """
     sub_queries = sub_queries or [question]
     with ThreadPoolExecutor(max_workers=min(8, len(sub_queries))) as ex:
-        futures = [ex.submit(_flat_retrieve, retrievers, sq, final_k) for sq in sub_queries]
+        futures = [ex.submit(_flat_retrieve, retrievers, sq, sub_k) for sq in sub_queries]
         # Collect in SUBMIT order, not completion order: the round-robin
         # merge below is order-sensitive, so `as_completed` would make the
         # final chunk set depend on thread scheduling (non-reproducible).
@@ -328,7 +346,8 @@ def answer_stream(
             sub_queries = decompose_query(
                 llm,
                 question,
-                _build_catalog_summary(catalog),
+                # Scope the summary to what will actually be searched.
+                _build_catalog_summary(catalog, only=retrievers.keys()),
                 max_sub_queries=cfg.decompose_max,
                 timeout_s=cfg.decompose_timeout_s,
             )
@@ -342,6 +361,7 @@ def answer_stream(
                 question,
                 intent,
                 sub_queries,
+                sub_k=cfg.catalog_sub_k,
                 final_k=cfg.catalog_recall_k,
                 emitter=emitter,
                 metadata=event_metadata,

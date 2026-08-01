@@ -88,6 +88,7 @@ def _make_config(tmp_path: Path) -> Config:
         decompose_enabled=False,
         decompose_timeout_s=15.0,
         decompose_max=8,
+        catalog_sub_k=20,
         catalog_recall_k=20,
     )
 

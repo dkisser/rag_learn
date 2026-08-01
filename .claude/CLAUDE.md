@@ -80,6 +80,24 @@ client object.
   side's iterator into a single `gr.Chatbot` frame update via
   `_drain_to_chatbot`. A `TODO` in `src/rag_learn/app.py` (around line 125)
   marks the conversion point for true per-token streaming.
+- **`answer_stream`'s `metadata` is READ-ONLY input.** It is shallow-copied
+  before any routing field is written, because `eval/runner.py` shares one
+  dict across rows processed with `max_concurrency=3` — in-place writes
+  would bleed between questions. Callers that need the routing decisions
+  (the UI's caption) pass `routing_sink=`, a callback invoked at most once
+  per call with an immutable `routing.RoutingInfo`. Do NOT "fix" a missing
+  routing field by reintroducing mutation.
+- **Two different `k`s in the catalog branch.** `CATALOG_SUB_K` (default 8)
+  is how many candidates *each sub-query* pulls from *each retriever*;
+  `CATALOG_RECALL_K` (default 20) is how many survive the round-robin merge
+  and reach the prompt. The merge cap is the binding constraint — raising
+  only `CATALOG_SUB_K` will not put more chunks in the prompt.
+- **Catalog fan-out only searches the selected collection.** `app.on_submit`
+  passes `{slug: retriever}`, so the decomposer prompt is scoped via
+  `_build_catalog_summary(catalog, only=retrievers.keys())` — otherwise the
+  LLM invents sub-queries aimed at collections that will never be searched.
+  Unknown keys (legacy `chroma`/`milvus` compare mode) fall back to the full
+  catalog summary.
 - **Lazy SDK imports.** `retriever/chroma_impl.py` and `retriever/milvus_impl.py`
   import `chromadb` / `pymilvus` inside `__init__` so unrelated tests don't pay
   the model-download / native-import cost. Keep this pattern when adding new

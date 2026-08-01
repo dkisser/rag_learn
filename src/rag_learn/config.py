@@ -46,6 +46,7 @@ class Config:
     decompose_enabled: bool
     decompose_timeout_s: float
     decompose_max: int
+    catalog_sub_k: int
     catalog_recall_k: int
 
 
@@ -103,5 +104,6 @@ def load_config() -> Config:
         decompose_enabled=_parse_bool(os.environ.get("DECOMPOSE_ENABLED"), False),
         decompose_timeout_s=float(os.environ.get("DECOMPOSE_TIMEOUT_S", "15.0")),
         decompose_max=int(os.environ.get("DECOMPOSE_MAX", "8")),
+        catalog_sub_k=int(os.environ.get("CATALOG_SUB_K", "8")),
         catalog_recall_k=int(os.environ.get("CATALOG_RECALL_K", "20")),
     )

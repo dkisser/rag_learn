@@ -185,6 +185,7 @@ def test_answer_stream_with_config_over_fetches_candidates() -> None:
         decompose_enabled=False,
         decompose_timeout_s=15.0,
         decompose_max=8,
+        catalog_sub_k=20,
         catalog_recall_k=20,
     )
 
