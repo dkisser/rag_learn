@@ -27,7 +27,7 @@ import logging
 import time
 import uuid
 from collections.abc import Callable, Iterator
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -35,6 +35,7 @@ from rag_learn.config import CHUNK_DISPLAY_CHARS
 from rag_learn.eval.tracing import RAGEvent
 from rag_learn.perf import StreamPerf
 from rag_learn.retriever import Hit
+from rag_learn.routing import INTENT_LABELS, RoutingInfo
 
 if TYPE_CHECKING:
     from rag_learn.collections import Catalog
@@ -192,30 +193,31 @@ def _answer_catalog_recall(
     final_k: int,
     emitter: MetricsEmitter | None,
     metadata: dict[str, Any],
-    catalog: Catalog,
     retrieve_ms: float,
     result_key: str,
+    routing_sink: Callable[[RoutingInfo], None] | None = None,
 ) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]]:
     """Fan-out retrieve → round-robin merge → stream via catalog system prompt."""
     sub_queries = sub_queries or [question]
-    per_sub: list[list[Hit]] = []
     with ThreadPoolExecutor(max_workers=min(8, len(sub_queries))) as ex:
         futures = [ex.submit(_flat_retrieve, retrievers, sq, final_k) for sq in sub_queries]
-        for fut in as_completed(futures):
-            per_sub.append(fut.result())
+        # Collect in SUBMIT order, not completion order: the round-robin
+        # merge below is order-sensitive, so `as_completed` would make the
+        # final chunk set depend on thread scheduling (non-reproducible).
+        per_sub: list[list[Hit]] = [fut.result() for fut in futures]
 
     merged = _merge_dedup(per_sub, final_k=final_k)
     sys_msg, user_msg = build_prompt(merged, question, mode="catalog_recall")
 
-    if metadata is not None:
-        metadata.update(
-            {
-                "intent": intent,
-                "sub_queries": sub_queries,
-                "target_collections": [c.name for c in catalog.iter_collections()],
-                "merged_k": len(merged),
-            }
-        )
+    info = RoutingInfo(
+        intent="all" if intent == "all" else "specific",
+        sub_queries=tuple(sub_queries),
+        target_collections=tuple(retrievers.keys()),
+        merged_k=len(merged),
+    )
+    metadata.update(info.as_metadata())
+    if routing_sink is not None:
+        routing_sink(info)
     logger.info(
         "routing: intent=%s sub_queries=%d merged_k=%d",
         intent,
@@ -285,6 +287,7 @@ def answer_stream(
     reranker: Reranker | None = None,
     config: Config | None = None,
     catalog: Catalog | None = None,
+    routing_sink: Callable[[RoutingInfo], None] | None = None,
 ) -> dict[str, tuple[Iterator[str], list[Hit], Callable[[str], StreamPerf]]]:
     """Parallel retrieve → build prompt per side → stream tokens per side.
 
@@ -301,12 +304,20 @@ def answer_stream(
     each sub-query is retrieved independently, and the merged hits are
     fed into the catalog-recall system prompt. The reranker is NOT
     invoked in this branch.
+
+    ``metadata`` is READ-ONLY input: it is shallow-copied before any
+    routing field is written, because ``eval.runner`` shares one dict
+    across concurrently-processed rows. Callers that need to display the
+    routing decisions (the UI does) pass ``routing_sink`` — a callback
+    invoked at most once per call with an immutable :class:`RoutingInfo`.
+    It is NOT invoked when the intent classifier is disabled.
     """
     # IMPORTANT: shallow-copy the caller's dict so routing metadata writes
     # (intent / sub_queries / target_collections / merged_k) never mutate
     # the caller's object. The original dict is treated as read-only input.
     event_metadata: dict[str, Any] = dict(metadata) if metadata is not None else {}
     cfg = config
+    intent: INTENT_LABELS | None = None
 
     # Catalog-coverage branch: classify + (optional) decompose + fan-out.
     if cfg is not None and cfg.intent_enabled and catalog is not None:
@@ -334,11 +345,10 @@ def answer_stream(
                 final_k=cfg.catalog_recall_k,
                 emitter=emitter,
                 metadata=event_metadata,
-                catalog=catalog,
                 retrieve_ms=(time.perf_counter() - retrieve_started) * 1000.0,
                 result_key=result_key,
+                routing_sink=routing_sink,
             )
-            event_metadata["intent"] = intent
             return result
 
     # Original single-query path.
@@ -348,6 +358,20 @@ def answer_stream(
         retrievers, question, final_k=k, candidate_k=candidate_k, reranker=reranker
     )
     retrieve_ms = (time.perf_counter() - retrieve_started) * 1000.0
+
+    # Report the classification even when it did NOT trigger the catalog
+    # branch, so the caller can tell "classified as specific" apart from
+    # "classifier never ran".
+    if intent is not None:
+        specific_info = RoutingInfo(
+            intent=intent,
+            sub_queries=(),
+            target_collections=tuple(retrievers.keys()),
+            merged_k=sum(len(h) for h in hits_by_side.values()),
+        )
+        event_metadata.update(specific_info.as_metadata())
+        if routing_sink is not None:
+            routing_sink(specific_info)
 
     def _side(
         name: str,

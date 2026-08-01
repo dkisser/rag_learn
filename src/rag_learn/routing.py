@@ -19,10 +19,38 @@ import json
 import re
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
-from typing import Final, Literal, Protocol
+from dataclasses import dataclass
+from typing import Any, Final, Literal, Protocol
 
 INTENT_LABELS = Literal["specific", "all"]
 DECOMPOSE_MAX: Final = 8
+
+
+@dataclass(frozen=True)
+class RoutingInfo:
+    """Immutable record of the routing decisions taken for ONE question.
+
+    ``pipeline.answer_stream`` treats the caller's ``metadata`` dict as
+    read-only (``eval.runner`` shares a single dict across concurrently
+    processed rows, so in-place writes would bleed between questions).
+    Routing decisions are handed back through this value object instead —
+    see the ``routing_sink`` parameter of ``answer_stream``.
+    """
+
+    intent: INTENT_LABELS = "specific"
+    sub_queries: tuple[str, ...] = ()
+    target_collections: tuple[str, ...] = ()
+    merged_k: int = 0
+
+    def as_metadata(self) -> dict[str, Any]:
+        """Render as JSON-friendly metadata for :class:`RAGEvent` emission."""
+        return {
+            "intent": self.intent,
+            "sub_queries": list(self.sub_queries),
+            "target_collections": list(self.target_collections),
+            "merged_k": self.merged_k,
+        }
+
 
 INTENT_SYSTEM_PROMPT = (
     "You classify a user question for a RAG system. "

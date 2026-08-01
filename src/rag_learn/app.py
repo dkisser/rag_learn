@@ -20,6 +20,7 @@ from rag_learn.perf import StreamPerf
 from rag_learn.pipeline import answer_stream
 from rag_learn.reranker import build_reranker
 from rag_learn.retriever import Hit
+from rag_learn.routing import RoutingInfo
 
 # from rag_learn.retriever.milvus_impl import MilvusRetriever
 
@@ -49,22 +50,21 @@ def _format_perf(perf: StreamPerf | None) -> str:
     )
 
 
-def _format_routing(config: Config, metadata: dict[str, Any]) -> str:
+def _format_routing(config: Config, routing: RoutingInfo | None) -> str:
     """Render a one-line caption summarizing routing decisions.
 
-    Reads the metadata dict that ``answer_stream`` populated in-place with
-    ``intent`` / ``sub_queries`` / ``target_collections`` / ``merged_k``.
-    Falls back to "routing disabled" when the intent classifier is off.
+    ``routing`` is the value ``answer_stream`` pushed into its
+    ``routing_sink``; ``None`` means the classifier never ran for this
+    question. Falls back to "routing disabled" when the feature is off.
     """
     if not config.intent_enabled:
         return "_（routing 已关闭 — 设 `INTENT_ENABLED=true` 开启）_"
-    intent = metadata.get("intent", "specific")
-    sub_q = metadata.get("sub_queries", [])
-    target = metadata.get("target_collections", [])
-    merged = metadata.get("merged_k", "?")
+    if routing is None:
+        return "_（本次未产生 routing 信息）_"
     return (
-        f"intent: `{intent}` · sub-queries: `{len(sub_q)}` · "
-        f"target: `[{', '.join(target)}]` · unique hits: `{merged}`"
+        f"intent: `{routing.intent}` · sub-queries: `{len(routing.sub_queries)}` · "
+        f"target: `[{', '.join(routing.target_collections)}]` · "
+        f"unique hits: `{routing.merged_k}`"
     )
 
 
@@ -171,6 +171,7 @@ def build_app(
                 "hybrid_rrf_k": config.hybrid_rrf_k if config.hybrid_enabled else None,
             }
             try:
+                routing_seen: list[RoutingInfo] = []
                 outputs = answer_stream(
                     {collection_slug: retriever},
                     llm,
@@ -181,6 +182,7 @@ def build_app(
                     reranker=reranker,
                     config=config,
                     catalog=catalog,
+                    routing_sink=routing_seen.append,
                 )
             except Exception as exc:  # noqa: BLE001 — fail-open per spec §7
                 logger.exception("answer_stream failed")
@@ -197,9 +199,9 @@ def build_app(
             bot.value = bot.value + [{"role": "user", "content": q}]
             stream_iter, hits, perf_fn = outputs[collection_slug]
             chunks_md.value = _format_chunks(hits)
-            # Render the routing caption from the metadata dict that
-            # ``answer_stream`` populated in-place.
-            routing_md.value = _format_routing(config, metadata)
+            # Routing decisions come back through the sink, NOT through the
+            # metadata dict — the pipeline treats that dict as read-only.
+            routing_md.value = _format_routing(config, routing_seen[0] if routing_seen else None)
             try:
                 answer_text = _drain_to_chatbot(stream_iter)
             except Exception as exc:  # noqa: BLE001 — spec §7 RetrievalError
