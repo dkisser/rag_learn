@@ -53,6 +53,57 @@ def test_build_prompt_numbering_starts_at_one():
     assert "[0]" not in user_msg and "[3]" not in user_msg
 
 
+def test_build_prompt_system_uses_cs_style():
+    """SYSTEM_PROMPT should use 电商客服 style with '亲' as the address."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "亲" in sys_msg
+
+
+def test_build_prompt_system_includes_few_shot_examples():
+    """SYSTEM_PROMPT should embed few-shot Q/A examples to anchor tone.
+
+    The examples must NOT overlap with any question in the 25-row eval set
+    (otherwise the model would just parrot the ground truth). This test
+    asserts on example topics that are absent from the eval set.
+    """
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "Q:" in sys_msg
+    assert "A:" in sys_msg
+    # Anchor on the canonical out-of-eval example topics.
+    assert "保质期" in sys_msg
+    assert "入门手冲" in sys_msg or "器具" in sys_msg
+    assert "养豆" in sys_msg or "二氧化碳" in sys_msg
+
+
+def test_build_prompt_few_shot_does_not_leak_eval_questions():
+    """Few-shot examples must not duplicate any question in the eval set."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    leaked = [
+        "豆子怎么保存",
+        "AGTON",
+        "浅烘豆冲出来偏淡",
+        "退换政策",
+        "心悸",
+        "苏帕摩是什么豆子",
+    ]
+    for needle in leaked:
+        assert needle not in sys_msg, f"few-shot 示例泄露了 eval 题：{needle!r} — 换成无关问题"
+
+
+def test_build_prompt_system_preserves_experience_marker():
+    """'通常来说' marker must stay so experience-based answers stay traceable."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "通常来说" in sys_msg
+
+
+def test_build_prompt_system_no_markdown_decoration():
+    """New system prompt should not use Markdown headings / bold / emoji."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "##" not in sys_msg
+    assert "**" not in sys_msg
+    assert "😊" not in sys_msg and "☕️" not in sys_msg
+
+
 class _FakeRetriever:
     def __init__(self, hits: list[Hit]) -> None:
         self._hits = hits

@@ -40,12 +40,8 @@
   "38": "app.py",
   "39": "pipeline.py",
   "40": "Reranker",
-  "41": "test_pipeline.py",
-  "42": "CrossEncoderReranker",
   "43": "test_pipeline_parallel.py",
-  "44": "build_retriever",
   "45": "build_reranker",
-  "46": "config.py",
   "47": "runner.py",
   "48": "test_cli.py"
 }
