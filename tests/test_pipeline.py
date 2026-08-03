@@ -104,6 +104,47 @@ def test_build_prompt_system_no_markdown_decoration():
     assert "😊" not in sys_msg and "☕️" not in sys_msg
 
 
+def test_build_prompt_system_uses_relaxed_length():
+    """Length cap is 60-150 字, not 30-80 — most GT answers exceed 80 chars."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "60-150" in sys_msg
+    assert "30-80" not in sys_msg
+
+
+def test_build_prompt_system_drops_warning_marker():
+    """The ⚠️ '来自通用经验' marker hurt faithfulness — replaced with '补充：'."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "⚠️" not in sys_msg
+    assert "补充" in sys_msg
+
+
+def test_build_prompt_system_preserves_key_facts_priority():
+    """The prompt must explicitly tell the model to keep concrete facts (豆款/庄园/价格)."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "关键事实" in sys_msg or "豆款" in sys_msg
+    assert "庄园" in sys_msg or "价格" in sys_msg
+
+
+def test_build_prompt_system_forbids_policy_softening():
+    """08-3_05 lesson: model softened '不发货' → '不参与包邮'. Prompt must forbid this."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    # Must tell the model to copy hard policy language verbatim.
+    assert "原话" in sys_msg or "不软化" in sys_msg or "不要软化" in sys_msg
+
+
+def test_build_prompt_system_softens_experience_marker():
+    """'小经验：' still triggered faithfulness drops — replace with '补充：'."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "小经验" not in sys_msg
+    assert "补充" in sys_msg
+
+
+def test_build_prompt_system_handles_no_relevant_context():
+    """When context is irrelevant, prompt must say 'don't add common-sense supplements'."""
+    sys_msg, _ = build_prompt(_hits(), "Q")
+    assert "未找到" in sys_msg or "无相关" in sys_msg or "不要基于常识" in sys_msg
+
+
 class _FakeRetriever:
     def __init__(self, hits: list[Hit]) -> None:
         self._hits = hits
