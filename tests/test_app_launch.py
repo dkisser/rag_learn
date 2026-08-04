@@ -8,7 +8,7 @@ from typing import Any
 import gradio as gr
 import pytest
 
-from rag_learn.app import _migrate_legacy_chroma, build_app
+from rag_learn.app import build_app
 from rag_learn.collections import Catalog, Collection
 from rag_learn.config import Config
 from rag_learn.eval.tracing import event_from_dict
@@ -44,84 +44,6 @@ def _make_config(tmp_path: Path) -> Config:
         catalog_sub_k=20,
         catalog_recall_k=20,
     )
-
-
-# ---- _migrate_legacy_chroma ----
-
-
-def test_migrate_noop_when_target_exists(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
-    config.chroma_dir.mkdir(parents=True)
-    target = config.chroma_dir / "rag_doc"
-    target.mkdir()
-    marker = config.chroma_dir / ".migrated"
-    # Drop a fake legacy file to prove it isn't touched
-    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
-
-    _migrate_legacy_chroma(config)
-
-    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched
-    assert not marker.exists()
-
-
-def test_migrate_moves_sqlite_and_uuid_dirs(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
-    config.chroma_dir.mkdir(parents=True)
-    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
-    uuid_dir = config.chroma_dir / "01234567-89ab-cdef-0123-456789abcdef"
-    uuid_dir.mkdir()
-    (uuid_dir / "index.bin").write_bytes(b"\x00" * 4)
-
-    _migrate_legacy_chroma(config)
-
-    target = config.chroma_dir / "rag_doc"
-    assert target.is_dir()
-    assert (target / "chroma.sqlite3").read_text() == "legacy"
-    assert (target / "01234567-89ab-cdef-0123-456789abcdef" / "index.bin").exists()
-    assert not (config.chroma_dir / "chroma.sqlite3").exists()
-    assert not uuid_dir.exists()
-    assert (config.chroma_dir / ".migrated").exists()
-
-
-def test_migrate_idempotent_via_marker(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
-    config.chroma_dir.mkdir(parents=True)
-    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
-    (config.chroma_dir / ".migrated").write_text("prior run")
-
-    _migrate_legacy_chroma(config)
-
-    target = config.chroma_dir / "rag_doc"
-    assert not target.exists()  # not migrated because marker says done
-    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched
-
-
-def test_migrate_noop_when_nothing_to_migrate(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
-    config.chroma_dir.mkdir(parents=True)
-
-    _migrate_legacy_chroma(config)
-
-    assert not (config.chroma_dir / "rag_doc").exists()
-    assert not (config.chroma_dir / ".migrated").exists()
-
-
-def test_migrate_fail_open_on_io_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """I/O failure during migration must not crash startup."""
-    config = _make_config(tmp_path)
-    config.chroma_dir.mkdir(parents=True)
-    (config.chroma_dir / "chroma.sqlite3").write_text("legacy")
-
-    def _boom(*args, **kwargs):
-        raise OSError("disk full")
-
-    monkeypatch.setattr("rag_learn.app.shutil.move", _boom)
-
-    _migrate_legacy_chroma(config)
-
-    # Marker should be written so the failing migration isn't retried every launch.
-    assert (config.chroma_dir / ".migrated").exists()
-    assert (config.chroma_dir / "chroma.sqlite3").exists()  # untouched after failure
 
 
 # ---- build_app(catalog=...) ----

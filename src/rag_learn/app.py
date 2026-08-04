@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-import re
-import shutil
 from collections.abc import Iterator
-from pathlib import Path
 from typing import Any
 
 import gradio as gr
@@ -266,7 +263,6 @@ def launch() -> None:
 
     config.data_dir.mkdir(parents=True, exist_ok=True)
     config.chroma_dir.mkdir(parents=True, exist_ok=True)
-    _migrate_legacy_chroma(config)
 
     llm = DeepSeekLLM(
         api_key=config.deepseek_api_key,
@@ -307,44 +303,3 @@ def launch() -> None:
     # Disable Gradio's analytics daemon — see CLAUDE.md macOS ARM note.
     os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
     app.queue().launch(server_name="127.0.0.1", server_port=7860)
-
-
-# ---- Legacy migration ----
-
-
-_UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
-
-
-def _migrate_legacy_chroma(config: Config) -> None:
-    """一次性：把 data/chroma/ 根下的遗留文件搬到 data/chroma/rag_doc/。
-
-    触发条件：data/chroma/rag_doc/ 不存在 AND 没有 .migrated 标记 AND
-    chroma.sqlite3 或 UUID 子目录存在。
-    幂等：迁移完成后写 data/chroma/.migrated。
-    """
-    target = config.chroma_dir / "rag_doc"
-    marker = config.chroma_dir / ".migrated"
-    if target.exists() or marker.exists():
-        return
-    if not config.chroma_dir.exists():
-        return
-
-    legacy: list[Path] = [
-        *config.chroma_dir.glob("chroma.sqlite3"),
-        *(p for p in config.chroma_dir.iterdir() if p.is_dir() and _UUID_RE.match(p.name)),
-    ]
-    if not legacy:
-        return
-
-    target.mkdir(parents=True, exist_ok=True)
-    try:
-        for src in legacy:
-            shutil.move(str(src), str(target / src.name))
-        marker.write_text("migrated\n", encoding="utf-8")
-        logger.info("Migrated legacy Chroma data: %d entries -> %s", len(legacy), target)
-    except Exception as exc:  # noqa: BLE001 — migration failure is fail-open per spec §7
-        logger.warning("Legacy Chroma migration failed: %s; continuing startup", exc)
-        try:
-            marker.write_text("failed\n", encoding="utf-8")
-        except Exception:  # noqa: BLE001 — best-effort marker to avoid retry
-            pass

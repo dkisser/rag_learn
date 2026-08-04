@@ -37,13 +37,7 @@
   "35": "test_e2e.py",
   "36": "retriever/base.py",
   "37": "test_tracing.py",
-  "38": "app.py",
-  "39": "pipeline.py",
   "40": "Reranker",
   "41": "tracing.py",
-  "42": "JSONLEmitter",
-  "46": ".as_metadata",
-  "48": "test_cli.py",
-  "49": "_make_judge_fn",
-  "50": "pipeline.py"
+  "49": "_make_judge_fn"
 }

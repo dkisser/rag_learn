@@ -119,7 +119,7 @@ def test_paths_resolve_relative_to_repo(monkeypatch):
     # Walked-up root must be a directory that actually contains pyproject.toml.
     # (Name varies between main checkout "rag_learn" and worktrees.)
     assert (cfg.repo_root / "pyproject.toml").is_file()
-    assert cfg.docs_dir.name == "rag_doc"
+    assert cfg.docs_dir.name == "shanzhongshi"
     assert cfg.data_dir.name == "data"
 
 

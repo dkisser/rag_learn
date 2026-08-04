@@ -207,12 +207,12 @@ def test_catalog_ensure_all_indexed_fail_open(fake_docs: Path):
 # ---- BUILTIN_COLLECTIONS + build_catalog ----
 
 
-def test_build_catalog_contains_rag_doc_and_shanzhongshi():
+def test_build_catalog_contains_shanzhongshi():
     from rag_learn.collections import build_catalog
 
     catalog = build_catalog()
     names = set(catalog.names())
-    assert {"rag_doc", "shanzhongshi"}.issubset(names)
+    assert "shanzhongshi" in names
 
 
 def test_builtin_collections_point_at_real_docs_dirs():

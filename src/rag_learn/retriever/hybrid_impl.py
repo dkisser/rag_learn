@@ -20,7 +20,7 @@ class HybridRetriever:
     def __init__(
         self,
         persist_dir: Path,
-        collection_name: str = "rag_doc",
+        collection_name: str = "shanzhongshi",
         *,
         rrf_k: int = 60,
         max_distance: float | None = None,

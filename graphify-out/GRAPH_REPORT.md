@@ -1,16 +1,16 @@
 # Graph Report - rag_learn  (2026-08-04)
 
 ## Corpus Check
-- 86 files · ~39,261 words
+- 86 files · ~38,887 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 952 nodes · 2314 edges · 47 communities (37 shown, 10 thin omitted)
+- 944 nodes · 2288 edges · 41 communities (31 shown, 10 thin omitted)
 - Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 214 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dbdd6da1`
+- Built from commit: `99f3ce56`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -50,20 +50,14 @@
 - test_e2e.py
 - retriever/base.py
 - test_tracing.py
-- app.py
-- pipeline.py
 - Reranker
 - tracing.py
-- JSONLEmitter
-- .as_metadata
-- test_cli.py
 - _make_judge_fn
-- pipeline.py
 
 ## God Nodes (most connected - your core abstractions)
 1. `Hit` - 88 edges
 2. `Catalog` - 57 edges
-3. `Config` - 57 edges
+3. `Config` - 56 edges
 4. `answer_stream()` - 51 edges
 5. `Collection` - 42 edges
 6. `DeepSeekLLM` - 36 edges
@@ -73,16 +67,16 @@
 10. `StreamPerf` - 27 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `StubRetriever` --uses--> `Collection`  [INFERRED]
-  tests/test_app_launch.py → src/rag_learn/collections.py
+- `main()` --calls--> `launch()`  [EXTRACTED]
+  main.py → src/rag_learn/app.py
 - `FakeRetriever` --uses--> `Collection`  [INFERRED]
   tests/test_collections.py → src/rag_learn/collections.py
 - `_AltStub` --uses--> `Collection`  [INFERRED]
   tests/test_e2e.py → src/rag_learn/collections.py
-- `_FakeChoice` --uses--> `Collection`  [INFERRED]
+- `_FakeStream` --uses--> `Collection`  [INFERRED]
   tests/test_e2e.py → src/rag_learn/collections.py
-- `_FakeChunk` --uses--> `Collection`  [INFERRED]
-  tests/test_e2e.py → src/rag_learn/collections.py
+- `_NoopRetriever` --uses--> `Collection`  [INFERRED]
+  tests/test_pipeline_catalog_fanout.py → src/rag_learn/collections.py
 
 ## Import Cycles
 - None detected.
@@ -93,47 +87,47 @@
 - **RAG retrieval flow** — readme_rag_learn, readme_chroma, readme_persistentclient, readme_all_minilm_l6_v2, readme_gradio, readme_gr_chatbot, readme_deepseek, readme_deepseekllm_stream [EXTRACTED 1.00]
 - **batch evaluation pipeline** — readme_rag_learn_eval_cli, readme_csv_template, readme_ratelimiter, readme_shanzhongshi_qa_csv, readme_2026_07_22_batch_evaluation_design_md [EXTRACTED 1.00]
 
-## Communities (47 total, 10 thin omitted)
+## Communities (41 total, 10 thin omitted)
 
 ### Community 0 - "Eval Event Tracing"
-Cohesion: 0.14
-Nodes (17): _build_catalog_summary(), Render a one-line-per-collection string for the decomposer prompt.      ``only``, _NoopRetriever, Path, Tests for catalog fan-out scoping (A) and the split k parameters (B).  A — the d, Legacy compare mode keys ('chroma'/'milvus') are not catalog names., Returns ``n_hits`` unique hits per query and records the k it got., _RecordingRetriever (+9 more)
+Cohesion: 0.06
+Nodes (53): _drain_to_chatbot(), _format_chunks(), _format_routing(), Gradio UI: collection dropdown + single answer panel with chunks and perf metric, Render a one-line caption summarizing routing decisions.      ``routing`` is the, Consume an answer_stream's iterator and return the joined text., Config, _build_catalog_summary() (+45 more)
 
 ### Community 1 - "Batch Loader & Dedup"
 Cohesion: 0.18
 Nodes (13): _make_catalog(), _make_config(), _NoopRetriever, _PerQueryFakeRetriever, Path, Regression tests for cross-call metadata isolation in pipeline.answer_stream.  T, When the catalog branch fires, the caller's metadata dict is unchanged., Specific-intent path also must not mutate the caller's dict. (+5 more)
 
 ### Community 2 - "Gradio App Surface"
-Cohesion: 0.10
-Nodes (30): LogCaptureFixture, ConfigError, load_config(), _parse_bool(), _parse_optional_float(), Path, Process-wide configuration loaded once from environment variables., Raised when required configuration is missing or invalid. (+22 more)
+Cohesion: 0.14
+Nodes (24): ConfigError, load_config(), _parse_bool(), _parse_optional_float(), Process-wide configuration loaded once from environment variables., Raised when required configuration is missing or invalid., 解析可选的有限浮点数，留空表示禁用该配置。, 新增的 6 个 routing 字段默认值(开关默认关,其余走 dataclass 默认). (+16 more)
 
 ### Community 3 - "Collections Catalog"
-Cohesion: 0.18
-Nodes (21): Collection, 一个独立的知识库：slug + 显示元数据 + 文档目录 + retriever 工厂。      `retriever` 是懒加载属性：首次访问时由 `ret, fake_docs(), _fake_factory(), _make_collection(), Path, Tests for Collection dataclass and lazy retriever cache., test_catalog_display_choices() (+13 more)
+Cohesion: 0.07
+Nodes (46): KeyError, Catalog, Collection, CollectionNotFoundError, Eager 触发每个 collection 的 retriever 懒加载。fail-open.          Returns list of (colle, 一个独立的知识库：slug + 显示元数据 + 文档目录 + retriever 工厂。      `retriever` 是懒加载属性：首次访问时由 `ret, 请求的 collection 不在 Catalog 里。, 不可变集合注册表：slug → Collection 双向索引。 (+38 more)
 
 ### Community 4 - "Document Loader & Chunking"
 Cohesion: 0.12
 Nodes (20): iter_markdown(), load_documents(), Path, Read all *.md in docs_dir and return a flat list of chunks., Return list of (filename, raw_text) sorted by filename, deterministic., Index once for the vector store and once for the BM25 keyword index., Each H1's text must appear inside the resulting chunk so the embedding     can m, Multi-H1 fixture (bean-card layout): every chunk must mention only its     own b (+12 more)
 
 ### Community 5 - "Eval CLI Dispatch"
-Cohesion: 0.05
-Nodes (65): ArgumentParser, _build_parser(), main(), CLI entry point for batch RAG evaluation., format_csv_row(), parse_csv_row(), CSV row parsing and formatting for batch evaluation., Parse a CSV row into question, collection, and optional ground truth.      Retur (+57 more)
+Cohesion: 0.07
+Nodes (37): ArgumentParser, _build_parser(), main(), CLI entry point for batch RAG evaluation., format_csv_row(), parse_csv_row(), CSV row parsing and formatting for batch evaluation., Parse a CSV row into question, collection, and optional ground truth.      Retur (+29 more)
 
 ### Community 6 - "Batch Metric Computation"
 Cohesion: 0.05
-Nodes (97): _aggregate(), _compute_supervised(), _compute_unsupervised(), _dedupe(), _ground_truth_to_dict(), _load_events(), main(), _make_judge_fn() (+89 more)
+Nodes (94): _aggregate(), _compute_supervised(), _compute_unsupervised(), _dedupe(), _ground_truth_to_dict(), _load_events(), main(), _make_judge_fn() (+86 more)
 
 ### Community 7 - "LLM Judge & DeepSeek Client"
 Cohesion: 0.06
-Nodes (42): DeepSeekLLM, Any, DeepSeek LLM client; uses the OpenAI SDK with DeepSeek's base URL., _AltStub, _FakeChoice, _FakeChunk, _FakeStream, _make_config() (+34 more)
+Nodes (45): Blocks, build_app(), _format_perf(), Any, Construct the Gradio UI but do not launch it.      Args:         catalog: The co, DeepSeekLLM, Any, DeepSeek LLM client; uses the OpenAI SDK with DeepSeek's base URL. (+37 more)
 
 ### Community 8 - "Milvus Retriever Adapter"
 Cohesion: 0.10
-Nodes (24): _load_collection_subprocess(), MilvusRetriever, Any, Path, Subprocess entry point: open MilvusClient and load the collection.      Runs in, Run target(*args) in an isolated subprocess.      Returns True iff the subproces, Isolated wrapper around MilvusClient.load_collection.      Returns True on succe, _run_isolated() (+16 more)
+Nodes (25): _load_collection_subprocess(), MilvusRetriever, Any, Path, Milvus Lite (embedded) adapter implementing BaseRetriever.  Uses pymilvus.model., Subprocess entry point: open MilvusClient and load the collection.      Runs in, Run target(*args) in an isolated subprocess.      Returns True iff the subproces, Isolated wrapper around MilvusClient.load_collection.      Returns True on succe (+17 more)
 
 ### Community 9 - "Rate Limiting Primitives"
-Cohesion: 0.09
-Nodes (13): _format_chunks(), Return a new list of hits sorted by descending relevance.          The returned, 为每个问题-命中对打分，按降序返回过滤后的命中。, Hit, Retriever contract shared by all adapter implementations., Return up to ``k`` hits sorted by descending BM25 score., Chroma adapter implementing BaseRetriever via PersistentClient + default embedde, Factory that picks the right retriever implementation based on config. (+5 more)
+Cohesion: 0.24
+Nodes (5): CrossEncoderReranker, Local cross-encoder reranker using sentence-transformers CrossEncoder., 为每个问题-命中对打分，按降序返回过滤后的命中。, Unit tests for CrossEncoderReranker using mocked CrossEncoder., TestCrossEncoderReranker
 
 ### Community 10 - "Batch Eval Runner"
 Cohesion: 0.17
@@ -148,8 +142,8 @@ Cohesion: 0.10
 Nodes (24): 2026-07-22-batch-evaluation-design.md, all-MiniLM-L6-v2, Chroma, evaluation CSV template, data/chroma/, DeepSeek, DeepSeekLLM.stream, gr.Chatbot (+16 more)
 
 ### Community 13 - "Logging Configuration"
-Cohesion: 0.14
-Nodes (21): Handler, create_handlers(), get_log_level(), Path, Process-wide logging configuration., Walk up from ``start_path`` until we find pyproject.toml.      Robust to worktre, Resolve a log-level name to a ``logging`` level integer.      Reads from the ``L, Create console and file handlers, ensuring the log directory exists. (+13 more)
+Cohesion: 0.12
+Nodes (23): Handler, main(), CLI shim: `python main.py` → launch the Gradio RAG compare app., create_handlers(), get_log_level(), Path, Process-wide logging configuration., Walk up from ``start_path`` until we find pyproject.toml.      Robust to worktre (+15 more)
 
 ### Community 14 - "Graphify Skill Docs"
 Cohesion: 0.22
@@ -164,8 +158,8 @@ Cohesion: 0.67
 Nodes (4): Chroma Retriever, Gradio UI, Milvus Lite Retriever, rag-learn Project
 
 ### Community 26 - "test_app_launch.py"
-Cohesion: 0.12
-Nodes (27): _FakeReranker, _make_catalog(), _make_config(), _NoopRetriever, _PerQueryFakeRetriever, Path, Integration tests for intent-aware routing in pipeline.answer_stream., When intent_enabled=False, the LLM's classify intent is never invoked. (+19 more)
+Cohesion: 0.06
+Nodes (48): ListEmitter, StreamPerf, answer_stream(), Run all retrievers in parallel (threads); return their Hits per side.      Each, Parallel retrieve → build prompt per side → stream tokens per side.      Returns, _retrieve(), Hit, _FakeLLM (+40 more)
 
 ### Community 27 - "doc_beans.md"
 Cohesion: 0.50
@@ -176,60 +170,36 @@ Cohesion: 0.10
 Nodes (26): BaseException, RuntimeError, is_rate_limit_error(), Any, Limiter, RateLimiter, Thin wrapper composing pyrate-limiter + threading.Semaphore + tenacity.  Used by, Return True iff ``exc`` represents an HTTP 429 from any layer. (+18 more)
 
 ### Community 32 - "loader.py"
-Cohesion: 0.21
-Nodes (15): _hit(), _make_catalog(), _NoopRetriever, _PerQueryFakeRetriever, Path, Tests for the ``routing_sink`` out-parameter of ``pipeline.answer_stream``.  The, intent=='specific' → sink still fires, with no sub-queries., No classifier ran → nothing to report; the sink stays untouched. (+7 more)
+Cohesion: 0.18
+Nodes (22): _load_existing_keys(), Path, Read a Q&A CSV, run each question through RAG, emit events, and evaluate., Return (collection, question) pairs already emitted to ``events_file``.      Rea, run_qa_csv(), _find_events_file(), MonkeyPatch, Path (+14 more)
 
 ### Community 33 - "BM25Index"
-Cohesion: 0.22
-Nodes (12): BM25Index, In-memory BM25 keyword index., Path, _chunks(), Tests for the BM25 keyword index., test_build_replaces_existing_index(), test_search_finds_keyword_match_and_orders_by_score(), test_search_respects_k_limit() (+4 more)
+Cohesion: 0.18
+Nodes (13): BM25Index, In-memory BM25 keyword index., Return up to ``k`` hits sorted by descending BM25 score., Path, _chunks(), Tests for the BM25 keyword index., test_build_replaces_existing_index(), test_search_finds_keyword_match_and_orders_by_score() (+5 more)
 
 ### Community 34 - "conftest.py"
-Cohesion: 0.08
-Nodes (38): PromptMode, build_prompt(), Return ``(system_msg, user_msg)`` with display-safe chunk lengths., _FakeLLM, _FakeReranker, _FakeRetriever, _hits(), New system prompt should not use Markdown headings / bold / emoji. (+30 more)
+Cohesion: 0.07
+Nodes (47): PromptMode, MetricsEmitter, Protocol, _answer_catalog_recall(), build_prompt(), _candidate_k(), _flat_retrieve(), _make_perf() (+39 more)
 
 ### Community 35 - "test_e2e.py"
-Cohesion: 0.16
-Nodes (14): Blocks, main(), CLI shim: `python main.py` → launch the Gradio RAG compare app., build_app(), _drain_to_chatbot(), _format_perf(), launch(), Any (+6 more)
-
-### Community 36 - "retriever/base.py"
-Cohesion: 0.24
-Nodes (20): _migrate_legacy_chroma(), 一次性：把 data/chroma/ 根下的遗留文件搬到 data/chroma/rag_doc/。      触发条件：data/chroma/rag_doc, _make_config(), Any, MonkeyPatch, Path, I/O failure during migration must not crash startup., Fake DeepSeekLLM whose .stream yields a single token. (+12 more)
+Cohesion: 0.32
+Nodes (5): LogCaptureFixture, build_reranker(), Build a reranker from config, or return None if disabled or unavailable., Tests for build_reranker factory., TestBuildReranker
 
 ### Community 37 - "test_tracing.py"
 Cohesion: 0.67
 Nodes (3): fixtures_dir(), Path, sample_hits()
 
-### Community 38 - "app.py"
-Cohesion: 0.38
-Nodes (10): _format_routing(), Render a one-line caption summarizing routing decisions.      ``routing`` is the, Config, make_routing_config(), Factory for a Config with the intent/decompose routing knobs set.      Keyword o, Unit tests for the routing caption rendered under the answer box.  Regression gu, test_routing_caption_disabled(), test_routing_caption_none_when_classifier_did_not_run() (+2 more)
-
-### Community 39 - "pipeline.py"
-Cohesion: 0.13
-Nodes (8): Catalog, Eager 触发每个 collection 的 retriever 懒加载。fail-open.          Returns list of (colle, 不可变集合注册表：slug → Collection 双向索引。, Yield each contained :class:`Collection` in declaration order., Satisfies BaseRetriever Protocol without touching Chroma., stub_catalog(), StubRetriever, test_catalog_iter_collections_empty()
-
 ### Community 40 - "Reranker"
-Cohesion: 0.13
-Nodes (13): Protocol, Reranker contract shared by all implementations., Reranker, CrossEncoderReranker, Cross-encoder reranker implementation backed by sentence-transformers., Local cross-encoder reranker using sentence-transformers CrossEncoder., Factory for building a reranker from configuration., Reranker components for refining retrieval results. (+5 more)
+Cohesion: 0.15
+Nodes (10): Protocol, Reranker contract shared by all implementations., Return a new list of hits sorted by descending relevance.          The returned, Reranker, Cross-encoder reranker implementation backed by sentence-transformers., Factory for building a reranker from configuration., Reranker components for refining retrieval results., Tests for the reranker module. (+2 more)
 
 ### Community 41 - "tracing.py"
-Cohesion: 0.19
-Nodes (12): KeyError, _build_builtin(), build_catalog(), CollectionNotFoundError, _default_factory(), _make_factory(), Path, Collection domain object: a single knowledge base (name, docs, retriever). (+4 more)
-
-### Community 42 - "JSONLEmitter"
-Cohesion: 0.29
-Nodes (6): _FakeLLM, _FakeRetriever, test_answer_stream_calls_each_retriever_and_each_llm(), test_answer_stream_collects_tokens_in_order(), test_answer_stream_empty_hits_still_yields_tokens(), test_answer_stream_returns_both_sides()
-
-### Community 46 - ".as_metadata"
-Cohesion: 0.22
-Nodes (7): Any, Intent classification and query decomposition for catalog-coverage queries.  Two, Immutable record of the routing decisions taken for ONE question.      ``pipelin, Render as JSON-friendly metadata for :class:`RAGEvent` emission., RoutingInfo, RoutingInfo is a frozen value object — callers cannot corrupt it., test_routing_info_is_immutable()
+Cohesion: 0.24
+Nodes (10): launch(), Production entry: load config, build catalog + LLM, migrate, ingest, serve., build_catalog(), Build the default catalog, optionally wiring hybrid retrieval and filtering., _load_catalog(), _make_llm(), _process_row(), Any (+2 more)
 
 ### Community 49 - "_make_judge_fn"
-Cohesion: 0.11
-Nodes (27): ChromaRetriever, Path, build_retriever(), Path, Build a retriever instance.      When ``hybrid_enabled`` is True, wraps ``Chroma, chroma_dir(), _FakeCollection, Path (+19 more)
-
-### Community 50 - "pipeline.py"
-Cohesion: 0.11
-Nodes (22): _answer_catalog_recall(), answer_stream(), _candidate_k(), _flat_retrieve(), _make_perf(), _merge_dedup(), _now_hms_ms(), Any (+14 more)
+Cohesion: 0.06
+Nodes (46): _build_builtin(), _default_factory(), _make_factory(), Path, Collection domain object: a single knowledge base (name, docs, retriever)., Build a retriever factory that captures the hybrid config., Path, Walk up from this file until we find pyproject.toml.      Robust to worktree dir (+38 more)
 
 ## Knowledge Gaps
 - **34 isolated node(s):** `rag-learn`, `苏帕摩-中度烘焙`, `耶加 TOH亚军地块-中度烘焙`, `达摩-中浅烘焙`, `Tiny` (+29 more)
@@ -239,12 +209,12 @@ Nodes (22): _answer_catalog_recall(), answer_stream(), _candidate_k(), _flat_ret
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Hit` connect `Rate Limiting Primitives` to `Eval Event Tracing`, `Batch Loader & Dedup`, `conftest.py`, `test_e2e.py`, `loader.py`, `test_tracing.py`, `Batch Metric Computation`, `Eval CLI Dispatch`, `Reranker`, `Milvus Retriever Adapter`, `Batch Eval Runner`, `pipeline.py`, `LLM Judge & DeepSeek Client`, `JSONLEmitter`, `HybridRetriever`, `_make_judge_fn`, `pipeline.py`, `test_app_launch.py`?**
-  _High betweenness centrality (0.215) - this node is a cross-community bridge._
-- **Why does `answer_stream()` connect `pipeline.py` to `Eval Event Tracing`, `Batch Loader & Dedup`, `loader.py`, `test_e2e.py`, `conftest.py`, `Eval CLI Dispatch`, `Batch Metric Computation`, `app.py`, `pipeline.py`, `LLM Judge & DeepSeek Client`, `Reranker`, `Rate Limiting Primitives`, `E2E Test Stubs`, `JSONLEmitter`, `.as_metadata`, `test_app_launch.py`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
-- **Why does `Config` connect `app.py` to `Eval Event Tracing`, `Batch Loader & Dedup`, `Gradio App Surface`, `test_e2e.py`, `retriever/base.py`, `conftest.py`, `Batch Metric Computation`, `pipeline.py`, `Reranker`, `LLM Judge & DeepSeek Client`, `loader.py`, `pipeline.py`, `test_app_launch.py`?**
-  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+- **Why does `Hit` connect `test_app_launch.py` to `Eval Event Tracing`, `BM25Index`, `conftest.py`, `Collections Catalog`, `retriever/base.py`, `test_tracing.py`, `Batch Metric Computation`, `Eval CLI Dispatch`, `Reranker`, `Rate Limiting Primitives`, `Batch Eval Runner`, `Milvus Retriever Adapter`, `loader.py`, `LLM Judge & DeepSeek Client`, `Batch Loader & Dedup`, `HybridRetriever`, `_make_judge_fn`?**
+  _High betweenness centrality (0.217) - this node is a cross-community bridge._
+- **Why does `answer_stream()` connect `test_app_launch.py` to `Eval Event Tracing`, `Batch Loader & Dedup`, `conftest.py`, `Collections Catalog`, `Batch Metric Computation`, `LLM Judge & DeepSeek Client`, `Reranker`, `tracing.py`, `E2E Test Stubs`, `_make_judge_fn`?**
+  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+- **Why does `Catalog` connect `Collections Catalog` to `Eval Event Tracing`, `loader.py`, `conftest.py`, `Batch Loader & Dedup`, `LLM Judge & DeepSeek Client`, `tracing.py`, `_make_judge_fn`, `test_app_launch.py`?**
+  _High betweenness centrality (0.071) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `Hit` (e.g. with `_make_event()` and `_hit()`) actually correct?**
   _`Hit` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 19 inferred relationships involving `Catalog` (e.g. with `StubRetriever` and `FakeRetriever`) actually correct?**

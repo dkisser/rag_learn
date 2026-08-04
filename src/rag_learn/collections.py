@@ -160,13 +160,6 @@ def _build_builtin(
     )
     return (
         Collection(
-            name="rag_doc",
-            display_name="RAG 论文集",
-            docs_dir=root / "rag_doc",
-            description="25 篇 RAG 相关论文 / 综述 / 实践文章",
-            retriever_factory=factory,
-        ),
-        Collection(
             name="shanzhongshi",
             display_name="山中事咖啡",
             docs_dir=root / "shanzhongshi",

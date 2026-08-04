@@ -16,7 +16,7 @@ class ChromaRetriever:
     def __init__(
         self,
         persist_dir: Path,
-        collection_name: str = "rag_doc",
+        collection_name: str = "shanzhongshi",
         *,
         max_distance: float | None = None,
     ) -> None:

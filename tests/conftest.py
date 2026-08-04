@@ -34,7 +34,7 @@ def make_routing_config() -> Callable[..., Config]:
             "chunk_size": 800,
             "chunk_overlap": 50,
             "repo_root": base,
-            "docs_dir": base / "docs" / "rag_doc",
+            "docs_dir": base / "docs" / "shanzhongshi",
             "data_dir": base / "data",
             "chroma_dir": base / "data" / "chroma",
             "milvus_path": base / "data" / "milvus.db",

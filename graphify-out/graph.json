@@ -74,8 +74,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "main",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 13,
+      "community_name": "Logging Configuration",
       "norm_label": "main.py"
     },
     {
@@ -85,8 +85,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "main_main",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 13,
+      "community_name": "Logging Configuration",
       "norm_label": "main()"
     },
     {
@@ -96,8 +96,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "main_rationale_1",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 13,
+      "community_name": "Logging Configuration",
       "norm_label": "cli shim: `python main.py` \u2192 launch the gradio rag compare app."
     },
     {
@@ -132,63 +132,63 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_app",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "app.py"
     },
     {
       "label": "_format_chunks()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L30",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "src_rag_learn_app_format_chunks",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_format_chunks()"
     },
     {
       "label": "_format_perf()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L42",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "src_rag_learn_app_format_perf",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 7,
+      "community_name": "LLM Judge & DeepSeek Client",
       "norm_label": "_format_perf()"
     },
     {
       "label": "_format_routing()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L53",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "src_rag_learn_app_format_routing",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_format_routing()"
     },
     {
       "label": "_drain_to_chatbot()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L71",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "src_rag_learn_app_drain_to_chatbot",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_drain_to_chatbot()"
     },
     {
       "label": "build_app()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "src_rag_learn_app_build_app",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 7,
+      "community_name": "LLM Judge & DeepSeek Client",
       "norm_label": "build_app()"
     },
     {
@@ -198,8 +198,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_app_py_any",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 7,
+      "community_name": "LLM Judge & DeepSeek Client",
       "norm_label": "any"
     },
     {
@@ -209,31 +209,20 @@
       "source_location": "",
       "_origin": "ast",
       "id": "blocks",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 7,
+      "community_name": "LLM Judge & DeepSeek Client",
       "norm_label": "blocks"
     },
     {
       "label": "launch()",
       "file_type": "code",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L259",
+      "source_location": "L256",
       "_origin": "ast",
       "id": "src_rag_learn_app_launch",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "launch()"
-    },
-    {
-      "label": "_migrate_legacy_chroma()",
-      "file_type": "code",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L318",
-      "_origin": "ast",
-      "id": "src_rag_learn_app_migrate_legacy_chroma",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "_migrate_legacy_chroma()"
     },
     {
       "label": "Gradio UI: collection dropdown + single answer panel with chunks and perf metric",
@@ -242,64 +231,53 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_app_rationale_1",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "gradio ui: collection dropdown + single answer panel with chunks and perf metric"
     },
     {
       "label": "Render a one-line caption summarizing routing decisions.      ``routing`` is the",
       "file_type": "rationale",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L54",
+      "source_location": "L51",
       "_origin": "ast",
-      "id": "src_rag_learn_app_rationale_54",
-      "community": 38,
-      "community_name": "app.py",
+      "id": "src_rag_learn_app_rationale_51",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "render a one-line caption summarizing routing decisions.      ``routing`` is the"
     },
     {
       "label": "Consume an answer_stream's iterator and return the joined text.",
       "file_type": "rationale",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L72",
+      "source_location": "L69",
       "_origin": "ast",
-      "id": "src_rag_learn_app_rationale_72",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "id": "src_rag_learn_app_rationale_69",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "consume an answer_stream's iterator and return the joined text."
     },
     {
       "label": "Construct the Gradio UI but do not launch it.      Args:         catalog: The co",
       "file_type": "rationale",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L83",
+      "source_location": "L80",
       "_origin": "ast",
-      "id": "src_rag_learn_app_rationale_83",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "id": "src_rag_learn_app_rationale_80",
+      "community": 7,
+      "community_name": "LLM Judge & DeepSeek Client",
       "norm_label": "construct the gradio ui but do not launch it.      args:         catalog: the co"
     },
     {
       "label": "Production entry: load config, build catalog + LLM, migrate, ingest, serve.",
       "file_type": "rationale",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L260",
+      "source_location": "L257",
       "_origin": "ast",
-      "id": "src_rag_learn_app_rationale_260",
-      "community": 35,
-      "community_name": "test_e2e.py",
+      "id": "src_rag_learn_app_rationale_257",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "production entry: load config, build catalog + llm, migrate, ingest, serve."
-    },
-    {
-      "label": "\u4e00\u6b21\u6027\uff1a\u628a data/chroma/ \u6839\u4e0b\u7684\u9057\u7559\u6587\u4ef6\u642c\u5230 data/chroma/rag_doc/\u3002      \u89e6\u53d1\u6761\u4ef6\uff1adata/chroma/rag_doc",
-      "file_type": "rationale",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L319",
-      "_origin": "ast",
-      "id": "src_rag_learn_app_rationale_319",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "\u4e00\u6b21\u6027:\u628a data/chroma/ \u6839\u4e0b\u7684\u9057\u7559\u6587\u4ef6\u642c\u5230 data/chroma/rag_doc/\u3002      \u89e6\u53d1\u6761\u4ef6:data/chroma/rag_doc"
     },
     {
       "label": "collections.py",
@@ -308,8 +286,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_collections",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "collections.py"
     },
     {
@@ -319,8 +297,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_rag_learn_collections_default_factory",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "_default_factory()"
     },
     {
@@ -330,8 +308,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_collections_py_path",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "path"
     },
     {
@@ -363,8 +341,8 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "src_rag_learn_collections_collection_retriever",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": ".retriever()"
     },
     {
@@ -374,8 +352,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "src_rag_learn_collections_collectionnotfounderror",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "collectionnotfounderror"
     },
     {
@@ -385,8 +363,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "keyerror",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "keyerror"
     },
     {
@@ -396,8 +374,8 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "catalog"
     },
     {
@@ -407,8 +385,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_post_init",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".__post_init__()"
     },
     {
@@ -418,8 +396,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_names",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".names()"
     },
     {
@@ -429,8 +407,8 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_iter_collections",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".iter_collections()"
     },
     {
@@ -440,8 +418,8 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_display_choices",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".display_choices()"
     },
     {
@@ -451,8 +429,8 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_get",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".get()"
     },
     {
@@ -462,8 +440,8 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "src_rag_learn_collections_catalog_ensure_all_indexed",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".ensure_all_indexed()"
     },
     {
@@ -473,8 +451,8 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "src_rag_learn_collections_make_factory",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "_make_factory()"
     },
     {
@@ -484,15 +462,15 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "src_rag_learn_collections_build_builtin",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "_build_builtin()"
     },
     {
       "label": "build_catalog()",
       "file_type": "code",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L182",
+      "source_location": "L175",
       "_origin": "ast",
       "id": "src_rag_learn_collections_build_catalog",
       "community": 41,
@@ -506,8 +484,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_1",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "collection domain object: a single knowledge base (name, docs, retriever)."
     },
     {
@@ -528,8 +506,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_75",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "\u8bf7\u6c42\u7684 collection \u4e0d\u5728 catalog \u91cc\u3002"
     },
     {
@@ -539,8 +517,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_80",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "\u4e0d\u53ef\u53d8\u96c6\u5408\u6ce8\u518c\u8868:slug \u2192 collection \u53cc\u5411\u7d22\u5f15\u3002"
     },
     {
@@ -550,8 +528,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_95",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "yield each contained :class:`collection` in declaration order."
     },
     {
@@ -561,8 +539,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_111",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "eager \u89e6\u53d1\u6bcf\u4e2a collection \u7684 retriever \u61d2\u52a0\u8f7d\u3002fail-open.          returns list of (colle"
     },
     {
@@ -572,17 +550,17 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "src_rag_learn_collections_rationale_132",
-      "community": 41,
-      "community_name": "tracing.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "build a retriever factory that captures the hybrid config."
     },
     {
       "label": "Build the default catalog, optionally wiring hybrid retrieval and filtering.",
       "file_type": "rationale",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L187",
+      "source_location": "L180",
       "_origin": "ast",
-      "id": "src_rag_learn_collections_rationale_187",
+      "id": "src_rag_learn_collections_rationale_180",
       "community": 41,
       "community_name": "tracing.py",
       "norm_label": "build the default catalog, optionally wiring hybrid retrieval and filtering."
@@ -627,8 +605,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "src_rag_learn_config_config",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "config"
     },
     {
@@ -638,8 +616,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "src_rag_learn_config_repo_root",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "_repo_root()"
     },
     {
@@ -649,8 +627,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_config_py_path",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "path"
     },
     {
@@ -715,8 +693,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "src_rag_learn_config_rationale_57",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "walk up from this file until we find pyproject.toml.      robust to worktree dir"
     },
     {
@@ -1221,8 +1199,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "runner.py"
     },
     {
@@ -1232,8 +1210,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_load_catalog",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "_load_catalog()"
     },
     {
@@ -1243,8 +1221,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_py_any",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "any"
     },
     {
@@ -1254,8 +1232,8 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_make_llm",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "_make_llm()"
     },
     {
@@ -1265,8 +1243,8 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_load_existing_keys",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "_load_existing_keys()"
     },
     {
@@ -1276,8 +1254,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_py_path",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "path"
     },
     {
@@ -1287,8 +1265,8 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_process_row",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "_process_row()"
     },
     {
@@ -1298,8 +1276,8 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_run_qa_csv",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "run_qa_csv()"
     },
     {
@@ -1309,8 +1287,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_rationale_1",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 41,
+      "community_name": "tracing.py",
       "norm_label": "run a prepared q&a csv through the rag pipeline and evaluate it.  pacing is dele"
     },
     {
@@ -1320,8 +1298,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_rationale_50",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "return (collection, question) pairs already emitted to ``events_file``.      rea"
     },
     {
@@ -1331,8 +1309,8 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "src_rag_learn_eval_runner_rationale_151",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "read a q&a csv, run each question through rag, emit events, and evaluate."
     },
     {
@@ -1474,8 +1452,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_metricsemitter",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "metricsemitter"
     },
     {
@@ -1485,8 +1463,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_py_protocol",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "protocol"
     },
     {
@@ -1496,8 +1474,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_metricsemitter_emit",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": ".emit()"
     },
     {
@@ -1507,8 +1485,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_listemitter",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "listemitter"
     },
     {
@@ -1518,8 +1496,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_listemitter_init",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -1529,8 +1507,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "src_rag_learn_eval_tracing_listemitter_emit",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".emit()"
     },
     {
@@ -2035,8 +2013,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_rag_learn_perf_streamperf",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "streamperf"
     },
     {
@@ -2057,8 +2035,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "pipeline.py"
     },
     {
@@ -2090,8 +2068,8 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_now_hms_ms",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_now_hms_ms()"
     },
     {
@@ -2101,8 +2079,8 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_make_perf",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_make_perf()"
     },
     {
@@ -2112,8 +2090,8 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_candidate_k",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_candidate_k()"
     },
     {
@@ -2123,8 +2101,8 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_retrieve",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_retrieve()"
     },
     {
@@ -2145,8 +2123,8 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_flat_retrieve",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_flat_retrieve()"
     },
     {
@@ -2156,8 +2134,8 @@
       "source_location": "L210",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_merge_dedup",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_merge_dedup()"
     },
     {
@@ -2167,8 +2145,8 @@
       "source_location": "L228",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_answer_catalog_recall",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "_answer_catalog_recall()"
     },
     {
@@ -2178,8 +2156,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_py_any",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "any"
     },
     {
@@ -2189,8 +2167,8 @@
       "source_location": "L329",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_answer_stream",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "answer_stream()"
     },
     {
@@ -2200,8 +2178,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_1",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "rag pipeline prompt construction, parallel retrieval, and streaming perf.  `answ"
     },
     {
@@ -2222,8 +2200,8 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_148",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "compute how many candidates to fetch before optional reranking."
     },
     {
@@ -2233,8 +2211,8 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_163",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "run all retrievers in parallel (threads); return their hits per side.      each"
     },
     {
@@ -2255,8 +2233,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_203",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "fan-out one sub-query across every retriever; no reranker, take top-k each."
     },
     {
@@ -2266,8 +2244,8 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_211",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "round-robin merge across sub-query hit lists, dedup on (file, chunk_index)."
     },
     {
@@ -2277,8 +2255,8 @@
       "source_location": "L243",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_243",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "fan-out retrieve \u2192 round-robin merge \u2192 stream via catalog system prompt.      ``"
     },
     {
@@ -2288,8 +2266,8 @@
       "source_location": "L341",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_341",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "parallel retrieve \u2192 build prompt per side \u2192 stream tokens per side.      returns"
     },
     {
@@ -2299,8 +2277,8 @@
       "source_location": "L364",
       "_origin": "ast",
       "id": "src_rag_learn_pipeline_rationale_364",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 34,
+      "community_name": "conftest.py",
       "norm_label": "# important: shallow-copy the caller's dict so routing metadata writes"
     },
     {
@@ -2519,8 +2497,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "src_rag_learn_reranker_base_reranker_rank",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 40,
+      "community_name": "Reranker",
       "norm_label": ".rank()"
     },
     {
@@ -2541,8 +2519,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "src_rag_learn_reranker_base_rationale_13",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 40,
+      "community_name": "Reranker",
       "norm_label": "return a new list of hits sorted by descending relevance.          the returned"
     },
     {
@@ -2563,8 +2541,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "src_rag_learn_reranker_cross_encoder_impl_crossencoderreranker",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": "crossencoderreranker"
     },
     {
@@ -2574,8 +2552,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_rag_learn_reranker_cross_encoder_impl_crossencoderreranker_init",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".__init__()"
     },
     {
@@ -2607,8 +2585,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "src_rag_learn_reranker_cross_encoder_impl_rationale_14",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": "local cross-encoder reranker using sentence-transformers crossencoder."
     },
     {
@@ -2684,8 +2662,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "retriever/base.py"
     },
     {
@@ -2695,8 +2673,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_hit",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "hit"
     },
     {
@@ -2706,8 +2684,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_baseretriever",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "baseretriever"
     },
     {
@@ -2717,8 +2695,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_py_protocol",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "protocol"
     },
     {
@@ -2728,8 +2706,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_baseretriever_search",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": ".search()"
     },
     {
@@ -2739,8 +2717,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_baseretriever_ensure_indexed",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -2750,8 +2728,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_base_rationale_1",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "retriever contract shared by all adapter implementations."
     },
     {
@@ -2827,8 +2805,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_bm25_index_bm25index_search",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 33,
+      "community_name": "BM25Index",
       "norm_label": ".search()"
     },
     {
@@ -2904,8 +2882,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_bm25_index_rationale_56",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 33,
+      "community_name": "BM25Index",
       "norm_label": "return up to ``k`` hits sorted by descending bm25 score."
     },
     {
@@ -2915,8 +2893,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_chroma_impl",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "chroma_impl.py"
     },
     {
@@ -2981,8 +2959,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_chroma_impl_rationale_1",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "chroma adapter implementing baseretriever via persistentclient + default embedde"
     },
     {
@@ -2992,8 +2970,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_factory",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "retriever/factory.py"
     },
     {
@@ -3025,8 +3003,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_factory_rationale_1",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "factory that picks the right retriever implementation based on config."
     },
     {
@@ -3047,8 +3025,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_hybrid_impl",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "hybrid_impl.py"
     },
     {
@@ -3102,8 +3080,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_hybrid_impl_hybridretriever_search",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 36,
+      "community_name": "retriever/base.py",
       "norm_label": ".search()"
     },
     {
@@ -3113,8 +3091,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_hybrid_impl_rationale_1",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "hybrid retriever: chroma (vector) + bm25 (keyword), fused via rrf."
     },
     {
@@ -3146,8 +3124,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_hybrid_impl_rationale_51",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 36,
+      "community_name": "retriever/base.py",
       "norm_label": "fetch top-k from each retriever and fuse with reciprocal rank fusion."
     },
     {
@@ -3157,8 +3135,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_milvus_impl",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 8,
+      "community_name": "Milvus Retriever Adapter",
       "norm_label": "milvus_impl.py"
     },
     {
@@ -3278,8 +3256,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_retriever_milvus_impl_rationale_1",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 8,
+      "community_name": "Milvus Retriever Adapter",
       "norm_label": "milvus lite (embedded) adapter implementing baseretriever.  uses pymilvus.model."
     },
     {
@@ -3322,8 +3300,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_routing",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "routing.py"
     },
     {
@@ -3333,8 +3311,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_rag_learn_routing_routinginfo",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "routinginfo"
     },
     {
@@ -3344,8 +3322,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "src_rag_learn_routing_routinginfo_as_metadata",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": ".as_metadata()"
     },
     {
@@ -3355,8 +3333,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_rag_learn_routing_py_any",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "any"
     },
     {
@@ -3465,8 +3443,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_rag_learn_routing_rationale_1",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "intent classification and query decomposition for catalog-coverage queries.  two"
     },
     {
@@ -3476,8 +3454,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "src_rag_learn_routing_rationale_31",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "immutable record of the routing decisions taken for one question.      ``pipelin"
     },
     {
@@ -3487,8 +3465,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "src_rag_learn_routing_rationale_46",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "render as json-friendly metadata for :class:`ragevent` emission."
     },
     {
@@ -3597,8 +3575,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "tests_conftest_make_routing_config",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "make_routing_config()"
     },
     {
@@ -3619,8 +3597,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "tests_conftest_rationale_21",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "factory for a config with the intent/decompose routing knobs set.      keyword o"
     },
     {
@@ -3850,8 +3828,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_cli",
-      "community": 48,
-      "community_name": "test_cli.py",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "test_cli.py"
     },
     {
@@ -3861,8 +3839,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "tests_eval_test_cli_test_cli_sample_dispatched",
-      "community": 48,
-      "community_name": "test_cli.py",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "test_cli_sample_dispatched()"
     },
     {
@@ -3872,8 +3850,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "tests_eval_test_cli_test_cli_run_dispatched",
-      "community": 48,
-      "community_name": "test_cli.py",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "test_cli_run_dispatched()"
     },
     {
@@ -3883,8 +3861,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "tests_eval_test_cli_test_cli_evaluate_dispatched",
-      "community": 48,
-      "community_name": "test_cli.py",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "test_cli_evaluate_dispatched()"
     },
     {
@@ -3894,8 +3872,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_cli_rationale_1",
-      "community": 48,
-      "community_name": "test_cli.py",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "tests for rag_learn.eval.cli."
     },
     {
@@ -4444,8 +4422,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_runner",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_runner.py"
     },
     {
@@ -4455,8 +4433,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "tests_eval_test_runner_write_csv",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "_write_csv()"
     },
     {
@@ -4466,8 +4444,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_eval_test_runner_py_path",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "path"
     },
     {
@@ -4477,8 +4455,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_eval_test_runner_find_events_file",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "_find_events_file()"
     },
     {
@@ -4488,8 +4466,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_produces_events_and_report",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_produces_events_and_report()"
     },
     {
@@ -4499,8 +4477,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_eval_test_runner_py_monkeypatch",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "monkeypatch"
     },
     {
@@ -4510,8 +4488,8 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_skips_invalid_rows",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_skips_invalid_rows()"
     },
     {
@@ -4521,8 +4499,8 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "tests_eval_test_runner_seed_events_file",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "_seed_events_file()"
     },
     {
@@ -4532,8 +4510,8 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_skips_already_emitted_questions_on_resume",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_skips_already_emitted_questions_on_resume()"
     },
     {
@@ -4543,8 +4521,8 @@
       "source_location": "L256",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_reprocesses_when_resume_disabled",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_reprocesses_when_resume_disabled()"
     },
     {
@@ -4554,8 +4532,8 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_passes_reranker_and_config_to_answer_stream",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_passes_reranker_and_config_to_answer_stream()"
     },
     {
@@ -4565,8 +4543,8 @@
       "source_location": "L408",
       "_origin": "ast",
       "id": "tests_eval_test_runner_test_run_qa_csv_passes_limiter_args",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "test_run_qa_csv_passes_limiter_args()"
     },
     {
@@ -4576,8 +4554,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_runner_rationale_1",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "tests for rag_learn.eval.runner."
     },
     {
@@ -4587,8 +4565,8 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "tests_eval_test_runner_rationale_143",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "write a jsonl file at the exact ``events_path`` (creates parents)."
     },
     {
@@ -4598,8 +4576,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "tests_eval_test_runner_rationale_154",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "a csv re-run with resume=true skips (collection, question) already on disk."
     },
     {
@@ -4609,8 +4587,8 @@
       "source_location": "L259",
       "_origin": "ast",
       "id": "tests_eval_test_runner_rationale_259",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "with resume=false, even already-emitted questions are processed again."
     },
     {
@@ -4620,8 +4598,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_sampler",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "test_sampler.py"
     },
     {
@@ -4697,8 +4675,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_eval_test_sampler_rationale_1",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 6,
+      "community_name": "Batch Metric Computation",
       "norm_label": "tests for rag_learn.eval.sampler."
     },
     {
@@ -4906,8 +4884,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_app_launch",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_app_launch.py"
     },
     {
@@ -4917,8 +4895,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "tests_test_app_launch_make_config",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "_make_config()"
     },
     {
@@ -4928,140 +4906,74 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_app_launch_py_path",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "path"
-    },
-    {
-      "label": "test_migrate_noop_when_target_exists()",
-      "file_type": "code",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L52",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_test_migrate_noop_when_target_exists",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "test_migrate_noop_when_target_exists()"
-    },
-    {
-      "label": "test_migrate_moves_sqlite_and_uuid_dirs()",
-      "file_type": "code",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L67",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_test_migrate_moves_sqlite_and_uuid_dirs",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "test_migrate_moves_sqlite_and_uuid_dirs()"
-    },
-    {
-      "label": "test_migrate_idempotent_via_marker()",
-      "file_type": "code",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L86",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_test_migrate_idempotent_via_marker",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "test_migrate_idempotent_via_marker()"
-    },
-    {
-      "label": "test_migrate_noop_when_nothing_to_migrate()",
-      "file_type": "code",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L99",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_test_migrate_noop_when_nothing_to_migrate",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "test_migrate_noop_when_nothing_to_migrate()"
-    },
-    {
-      "label": "test_migrate_fail_open_on_io_error()",
-      "file_type": "code",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L109",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "test_migrate_fail_open_on_io_error()"
-    },
-    {
-      "label": "MonkeyPatch",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_py_monkeypatch",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "monkeypatch"
     },
     {
       "label": "StubRetriever",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L130",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "tests_test_app_launch_stubretriever",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "stubretriever"
     },
     {
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L133",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "tests_test_app_launch_stubretriever_init",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".__init__()"
     },
     {
       "label": ".ensure_indexed()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L138",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "tests_test_app_launch_stubretriever_ensure_indexed",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".ensure_indexed()"
     },
     {
       "label": ".search()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L141",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "tests_test_app_launch_stubretriever_search",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".search()"
     },
     {
       "label": "stub_catalog()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L154",
+      "source_location": "L76",
       "_origin": "ast",
       "id": "tests_test_app_launch_stub_catalog",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "stub_catalog()"
     },
     {
       "label": "_stub_llm()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L179",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "tests_test_app_launch_stub_llm",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "_stub_llm()"
     },
     {
@@ -5071,107 +4983,107 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_app_launch_py_any",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "any"
     },
     {
       "label": "test_build_app_with_catalog_builds_dropdown()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L189",
+      "source_location": "L111",
       "_origin": "ast",
       "id": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_build_app_with_catalog_builds_dropdown()"
     },
     {
       "label": "test_build_app_warns_on_failed_collections()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L201",
+      "source_location": "L123",
       "_origin": "ast",
       "id": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_build_app_warns_on_failed_collections()"
     },
     {
       "label": "test_build_app_logs_event_to_jsonl()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L215",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_build_app_logs_event_to_jsonl()"
     },
     {
       "label": "test_launch_filters_failed_collections()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L238",
+      "source_location": "L160",
       "_origin": "ast",
       "id": "tests_test_app_launch_test_launch_filters_failed_collections",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_launch_filters_failed_collections()"
+    },
+    {
+      "label": "MonkeyPatch",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "tests_test_app_launch_py_monkeypatch",
+      "community": 3,
+      "community_name": "Collections Catalog",
+      "norm_label": "monkeypatch"
     },
     {
       "label": "test_launch_exits_when_all_collections_fail()",
       "file_type": "code",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L300",
+      "source_location": "L222",
       "_origin": "ast",
       "id": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_launch_exits_when_all_collections_fail()"
-    },
-    {
-      "label": "I/O failure during migration must not crash startup.",
-      "file_type": "rationale",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "tests_test_app_launch_rationale_110",
-      "community": 36,
-      "community_name": "retriever/base.py",
-      "norm_label": "i/o failure during migration must not crash startup."
     },
     {
       "label": "Satisfies BaseRetriever Protocol without touching Chroma.",
       "file_type": "rationale",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L131",
+      "source_location": "L53",
       "_origin": "ast",
-      "id": "tests_test_app_launch_rationale_131",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "id": "tests_test_app_launch_rationale_53",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "satisfies baseretriever protocol without touching chroma."
     },
     {
       "label": "Fake DeepSeekLLM whose .stream yields a single token.",
       "file_type": "rationale",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L180",
+      "source_location": "L102",
       "_origin": "ast",
-      "id": "tests_test_app_launch_rationale_180",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "id": "tests_test_app_launch_rationale_102",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "fake deepseekllm whose .stream yields a single token."
     },
     {
       "label": "If one collection's retriever factory raises, build_app must not see it.",
       "file_type": "rationale",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L239",
+      "source_location": "L161",
       "_origin": "ast",
-      "id": "tests_test_app_launch_rationale_239",
-      "community": 36,
-      "community_name": "retriever/base.py",
+      "id": "tests_test_app_launch_rationale_161",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "if one collection's retriever factory raises, build_app must not see it."
     },
     {
@@ -5181,8 +5093,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_app_routing_display",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_app_routing_display.py"
     },
     {
@@ -5192,8 +5104,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "tests_test_app_routing_display_test_routing_caption_disabled",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_routing_caption_disabled()"
     },
     {
@@ -5203,8 +5115,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_test_app_routing_display_test_routing_caption_none_when_classifier_did_not_run",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_routing_caption_none_when_classifier_did_not_run()"
     },
     {
@@ -5214,8 +5126,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "tests_test_app_routing_display_test_routing_caption_renders_catalog_branch",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_routing_caption_renders_catalog_branch()"
     },
     {
@@ -5225,8 +5137,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "tests_test_app_routing_display_test_routing_caption_renders_specific_branch",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_routing_caption_renders_specific_branch()"
     },
     {
@@ -5236,8 +5148,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_app_routing_display_rationale_1",
-      "community": 38,
-      "community_name": "app.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "unit tests for the routing caption rendered under the answer box.  regression gu"
     },
     {
@@ -5665,8 +5577,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "tests_test_collections_fakeretriever",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "fakeretriever"
     },
     {
@@ -5676,8 +5588,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "tests_test_collections_fakeretriever_init",
-      "community": 3,
-      "community_name": "Collections Catalog",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": ".__init__()"
     },
     {
@@ -5698,8 +5610,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "tests_test_collections_fakeretriever_ensure_indexed",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -5709,8 +5621,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "tests_test_collections_fakeretriever_search",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": ".search()"
     },
     {
@@ -5863,8 +5775,8 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "tests_test_collections_test_catalog_iter_collections_empty",
-      "community": 39,
-      "community_name": "pipeline.py",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "test_catalog_iter_collections_empty()"
     },
     {
@@ -5912,15 +5824,15 @@
       "norm_label": "test_catalog_ensure_all_indexed_fail_open()"
     },
     {
-      "label": "test_build_catalog_contains_rag_doc_and_shanzhongshi()",
+      "label": "test_build_catalog_contains_shanzhongshi()",
       "file_type": "code",
       "source_file": "tests/test_collections.py",
       "source_location": "L210",
       "_origin": "ast",
-      "id": "tests_test_collections_test_build_catalog_contains_rag_doc_and_shanzhongshi",
+      "id": "tests_test_collections_test_build_catalog_contains_shanzhongshi",
       "community": 41,
       "community_name": "tracing.py",
-      "norm_label": "test_build_catalog_contains_rag_doc_and_shanzhongshi()"
+      "norm_label": "test_build_catalog_contains_shanzhongshi()"
     },
     {
       "label": "test_builtin_collections_point_at_real_docs_dirs()",
@@ -5962,8 +5874,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "tests_test_collections_rationale_15",
-      "community": 5,
-      "community_name": "Eval CLI Dispatch",
+      "community": 32,
+      "community_name": "loader.py",
       "norm_label": "minimal retriever that satisfies baseretriever for testing."
     },
     {
@@ -6193,8 +6105,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "tests_test_e2e_fakechoice",
-      "community": 7,
-      "community_name": "LLM Judge & DeepSeek Client",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "_fakechoice"
     },
     {
@@ -6204,8 +6116,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_test_e2e_fakechoice_init",
-      "community": 7,
-      "community_name": "LLM Judge & DeepSeek Client",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".__init__()"
     },
     {
@@ -6215,8 +6127,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "tests_test_e2e_fakechunk",
-      "community": 7,
-      "community_name": "LLM Judge & DeepSeek Client",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": "_fakechunk"
     },
     {
@@ -6226,8 +6138,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "tests_test_e2e_fakechunk_init",
-      "community": 7,
-      "community_name": "LLM Judge & DeepSeek Client",
+      "community": 3,
+      "community_name": "Collections Catalog",
       "norm_label": ".__init__()"
     },
     {
@@ -6523,8 +6435,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tests_test_hybrid_retriever_fakevectorretriever_init",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -6545,8 +6457,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "tests_test_hybrid_retriever_fakevectorretriever_search",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".search()"
     },
     {
@@ -6567,8 +6479,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "tests_test_hybrid_retriever_fakebm25_init",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -7700,8 +7612,8 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakeretriever",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_fakeretriever"
     },
     {
@@ -7711,8 +7623,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakeretriever_init",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -7722,8 +7634,8 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakeretriever_ensure_indexed",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -7733,8 +7645,8 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakeretriever_search",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".search()"
     },
     {
@@ -7744,8 +7656,8 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakereranker",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_fakereranker"
     },
     {
@@ -7755,8 +7667,8 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakereranker_init",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -7766,8 +7678,8 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakereranker_rank",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".rank()"
     },
     {
@@ -7777,8 +7689,8 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakellm",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_fakellm"
     },
     {
@@ -7788,8 +7700,8 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakellm_init",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -7799,8 +7711,8 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "tests_test_pipeline_fakellm_stream",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".stream()"
     },
     {
@@ -7810,8 +7722,8 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "tests_test_pipeline_test_answer_stream_emits_event_when_perf_fn_called_with_answer",
-      "community": 6,
-      "community_name": "Batch Metric Computation",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_emits_event_when_perf_fn_called_with_answer()"
     },
     {
@@ -7821,8 +7733,8 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "tests_test_pipeline_test_answer_stream_no_emitter_does_not_record",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_no_emitter_does_not_record()"
     },
     {
@@ -7832,8 +7744,8 @@
       "source_location": "L224",
       "_origin": "ast",
       "id": "tests_test_pipeline_test_answer_stream_reranker_reorders_and_truncates_to_k",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_reranker_reorders_and_truncates_to_k()"
     },
     {
@@ -7843,8 +7755,8 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "tests_test_pipeline_test_answer_stream_with_config_over_fetches_candidates",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_with_config_over_fetches_candidates()"
     },
     {
@@ -7854,8 +7766,8 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "tests_test_pipeline_test_answer_stream_no_reranker_uses_vector_order",
-      "community": 34,
-      "community_name": "conftest.py",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_no_reranker_uses_vector_order()"
     },
     {
@@ -8470,8 +8382,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_pipeline_parallel.py"
     },
     {
@@ -8481,8 +8393,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakeretriever",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_fakeretriever"
     },
     {
@@ -8492,8 +8404,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakeretriever_init",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -8503,8 +8415,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakeretriever_ensure_indexed",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -8514,8 +8426,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakeretriever_search",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".search()"
     },
     {
@@ -8525,8 +8437,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakellm",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "_fakellm"
     },
     {
@@ -8536,8 +8448,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakellm_init",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -8547,8 +8459,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_fakellm_stream",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".stream()"
     },
     {
@@ -8558,8 +8470,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_test_answer_stream_returns_both_sides",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_returns_both_sides()"
     },
     {
@@ -8569,8 +8481,8 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_test_answer_stream_collects_tokens_in_order",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_collects_tokens_in_order()"
     },
     {
@@ -8580,8 +8492,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_test_answer_stream_calls_each_retriever_and_each_llm",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_calls_each_retriever_and_each_llm()"
     },
     {
@@ -8591,8 +8503,8 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "tests_test_pipeline_parallel_test_answer_stream_empty_hits_still_yields_tokens",
-      "community": 42,
-      "community_name": "JSONLEmitter",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": "test_answer_stream_empty_hits_still_yields_tokens()"
     },
     {
@@ -9009,8 +8921,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_pipeline_routing_sink.py"
     },
     {
@@ -9020,8 +8932,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_perqueryfakeretriever",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_perqueryfakeretriever"
     },
     {
@@ -9031,8 +8943,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_perqueryfakeretriever_init",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".__init__()"
     },
     {
@@ -9042,8 +8954,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_perqueryfakeretriever_ensure_indexed",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -9053,8 +8965,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_perqueryfakeretriever_search",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".search()"
     },
     {
@@ -9064,8 +8976,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_scriptedroutingllm",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_scriptedroutingllm"
     },
     {
@@ -9075,8 +8987,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_scriptedroutingllm_init",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": ".__init__()"
     },
     {
@@ -9086,8 +8998,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_scriptedroutingllm_stream",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": ".stream()"
     },
     {
@@ -9097,8 +9009,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_noopretriever",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_noopretriever"
     },
     {
@@ -9108,8 +9020,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_noopretriever_ensure_indexed",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": ".ensure_indexed()"
     },
     {
@@ -9119,8 +9031,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_noopretriever_search",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 26,
+      "community_name": "test_app_launch.py",
       "norm_label": ".search()"
     },
     {
@@ -9130,8 +9042,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_make_catalog",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_make_catalog()"
     },
     {
@@ -9141,8 +9053,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_py_path",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "path"
     },
     {
@@ -9152,8 +9064,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_hit",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "_hit()"
     },
     {
@@ -9163,8 +9075,8 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_test_sink_receives_catalog_branch_routing",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_sink_receives_catalog_branch_routing()"
     },
     {
@@ -9174,8 +9086,8 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_test_sink_receives_specific_intent",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_sink_receives_specific_intent()"
     },
     {
@@ -9185,8 +9097,8 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_test_sink_not_called_when_intent_disabled",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_sink_not_called_when_intent_disabled()"
     },
     {
@@ -9196,8 +9108,8 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_test_sink_is_optional_and_metadata_still_not_mutated",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_sink_is_optional_and_metadata_still_not_mutated()"
     },
     {
@@ -9207,8 +9119,8 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_test_routing_info_is_immutable",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "test_routing_info_is_immutable()"
     },
     {
@@ -9218,8 +9130,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_1",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "tests for the ``routing_sink`` out-parameter of ``pipeline.answer_stream``.  the"
     },
     {
@@ -9229,8 +9141,8 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_79",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "intent=='all' + decompose \u2192 sink gets intent/sub_queries/merged_k."
     },
     {
@@ -9240,8 +9152,8 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_105",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "intent=='specific' \u2192 sink still fires, with no sub-queries."
     },
     {
@@ -9251,8 +9163,8 @@
       "source_location": "L131",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_131",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "no classifier ran \u2192 nothing to report; the sink stays untouched."
     },
     {
@@ -9262,8 +9174,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_154",
-      "community": 32,
-      "community_name": "loader.py",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "omitting the sink keeps the old signature working; dict stays clean."
     },
     {
@@ -9273,8 +9185,8 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "tests_test_pipeline_routing_sink_rationale_169",
-      "community": 46,
-      "community_name": ".as_metadata",
+      "community": 0,
+      "community_name": "Eval Event Tracing",
       "norm_label": "routinginfo is a frozen value object \u2014 callers cannot corrupt it."
     },
     {
@@ -9295,8 +9207,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": "testcrossencoderreranker"
     },
     {
@@ -9306,8 +9218,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker_test_rank_sorts_by_descending_score",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".test_rank_sorts_by_descending_score()"
     },
     {
@@ -9317,8 +9229,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker_test_rank_returns_new_hit_objects",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".test_rank_returns_new_hit_objects()"
     },
     {
@@ -9328,8 +9240,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker_test_rank_empty_input_returns_empty_list",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".test_rank_empty_input_returns_empty_list()"
     },
     {
@@ -9339,8 +9251,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker_test_constructor_passes_device_and_batch_size",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".test_constructor_passes_device_and_batch_size()"
     },
     {
@@ -9350,8 +9262,8 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "tests_test_reranker_testcrossencoderreranker_test_rank_filters_scores_below_threshold_inclusively",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": ".test_rank_filters_scores_below_threshold_inclusively()"
     },
     {
@@ -9361,8 +9273,8 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "tests_test_reranker_testbuildreranker",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": "testbuildreranker"
     },
     {
@@ -9372,8 +9284,8 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "tests_test_reranker_testbuildreranker_test_build_reranker_disabled_returns_none",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": ".test_build_reranker_disabled_returns_none()"
     },
     {
@@ -9383,8 +9295,8 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "tests_test_reranker_testbuildreranker_test_build_reranker_enabled_returns_instance",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": ".test_build_reranker_enabled_returns_instance()"
     },
     {
@@ -9394,8 +9306,8 @@
       "source_location": "L186",
       "_origin": "ast",
       "id": "tests_test_reranker_testbuildreranker_test_build_reranker_load_failure_returns_none_and_logs",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": ".test_build_reranker_load_failure_returns_none_and_logs()"
     },
     {
@@ -9405,8 +9317,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "logcapturefixture",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": "logcapturefixture"
     },
     {
@@ -9449,8 +9361,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "tests_test_reranker_rationale_14",
-      "community": 40,
-      "community_name": "Reranker",
+      "community": 9,
+      "community_name": "Rate Limiting Primitives",
       "norm_label": "unit tests for crossencoderreranker using mocked crossencoder."
     },
     {
@@ -9460,8 +9372,8 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "tests_test_reranker_rationale_104",
-      "community": 2,
-      "community_name": "Gradio App Surface",
+      "community": 35,
+      "community_name": "test_e2e.py",
       "norm_label": "tests for build_reranker factory."
     },
     {
@@ -9482,8 +9394,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_retriever_base",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "test_retriever_base.py"
     },
     {
@@ -9493,8 +9405,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "tests_test_retriever_base_test_hit_is_frozen",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "test_hit_is_frozen()"
     },
     {
@@ -9504,8 +9416,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "tests_test_retriever_base_test_hit_equality",
-      "community": 9,
-      "community_name": "Rate Limiting Primitives",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "test_hit_equality()"
     },
     {
@@ -9515,8 +9427,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "tests_test_retriever_base_test_protocol_recognises_conforming_class",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "test_protocol_recognises_conforming_class()"
     },
     {
@@ -9526,8 +9438,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "tests_test_retriever_base_test_protocol_rejects_non_conforming",
-      "community": 50,
-      "community_name": "pipeline.py",
+      "community": 49,
+      "community_name": "_make_judge_fn",
       "norm_label": "test_protocol_rejects_non_conforming()"
     },
     {
@@ -10750,7 +10662,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10761,7 +10673,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L71",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10772,7 +10684,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L30",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10783,7 +10695,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L42",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10794,7 +10706,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L53",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10805,7 +10717,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L259",
+      "source_location": "L256",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10813,22 +10725,11 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L318",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_rag_learn_app",
-      "target": "src_rag_learn_app_migrate_legacy_chroma",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10840,7 +10741,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10852,7 +10753,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10864,7 +10765,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10876,7 +10777,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10888,7 +10789,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10900,7 +10801,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10912,7 +10813,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10924,7 +10825,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L17",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10936,7 +10837,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L17",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10948,7 +10849,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L18",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10960,7 +10861,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L18",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10972,7 +10873,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L19",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10984,7 +10885,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L19",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -10996,7 +10897,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L20",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11008,7 +10909,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L20",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11020,7 +10921,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L21",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11032,7 +10933,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L21",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11044,7 +10945,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L22",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11056,7 +10957,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L22",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11068,7 +10969,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L23",
+      "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11080,7 +10981,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L23",
+      "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app",
@@ -11139,7 +11040,7 @@
       "context": "generic_arg",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L30",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_format_chunks",
@@ -11151,7 +11052,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L138",
+      "source_location": "L135",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11163,7 +11064,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L42",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_format_perf",
@@ -11175,7 +11076,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L53",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_format_routing",
@@ -11187,7 +11088,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L53",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_format_routing",
@@ -11198,10 +11099,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L54",
+      "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_rag_learn_app_rationale_54",
+      "source": "src_rag_learn_app_rationale_51",
       "target": "src_rag_learn_app_format_routing",
       "confidence_score": 1.0
     },
@@ -11257,10 +11158,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L72",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_rag_learn_app_rationale_72",
+      "source": "src_rag_learn_app_rationale_69",
       "target": "src_rag_learn_app_drain_to_chatbot",
       "confidence_score": 1.0
     },
@@ -11269,7 +11170,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11281,7 +11182,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11293,7 +11194,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11305,7 +11206,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L76",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11317,7 +11218,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L93",
+      "source_location": "L90",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11329,7 +11230,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L175",
+      "source_location": "L172",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_build_app",
@@ -11341,7 +11242,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L300",
+      "source_location": "L296",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11352,10 +11253,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L83",
+      "source_location": "L80",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_rag_learn_app_rationale_83",
+      "source": "src_rag_learn_app_rationale_80",
       "target": "src_rag_learn_app_build_app",
       "confidence_score": 1.0
     },
@@ -11365,7 +11266,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L217",
+      "source_location": "L139",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -11377,7 +11278,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L203",
+      "source_location": "L125",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
@@ -11389,7 +11290,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L191",
+      "source_location": "L113",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
@@ -11448,19 +11349,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L269",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_rag_learn_app_launch",
-      "target": "src_rag_learn_app_migrate_legacy_chroma",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L277",
+      "source_location": "L273",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11472,7 +11361,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L290",
+      "source_location": "L286",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11484,7 +11373,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L263",
+      "source_location": "L260",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11496,7 +11385,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L271",
+      "source_location": "L267",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11508,7 +11397,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L296",
+      "source_location": "L292",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_app_launch",
@@ -11519,95 +11408,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/app.py",
-      "source_location": "L260",
+      "source_location": "L257",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_rag_learn_app_rationale_260",
+      "source": "src_rag_learn_app_rationale_257",
       "target": "src_rag_learn_app_launch",
       "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L318",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_rag_learn_app_migrate_legacy_chroma",
-      "target": "src_rag_learn_config_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "src/rag_learn/app.py",
-      "source_location": "L319",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_rag_learn_app_rationale_319",
-      "target": "src_rag_learn_app_migrate_legacy_chroma",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L120",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "target": "src_rag_learn_app_migrate_legacy_chroma"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L92",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_idempotent_via_marker",
-      "target": "src_rag_learn_app_migrate_legacy_chroma"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L75",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_moves_sqlite_and_uuid_dirs",
-      "target": "src_rag_learn_app_migrate_legacy_chroma"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L103",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_nothing_to_migrate",
-      "target": "src_rag_learn_app_migrate_legacy_chroma"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L61",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_target_exists",
-      "target": "src_rag_learn_app_migrate_legacy_chroma"
     },
     {
       "relation": "contains",
@@ -11624,7 +11430,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L182",
+      "source_location": "L175",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_collections",
@@ -12000,7 +11806,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L163",
+      "source_location": "L85",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stub_catalog",
@@ -12023,7 +11829,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L311",
+      "source_location": "L233",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
@@ -12035,7 +11841,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L249",
+      "source_location": "L171",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
@@ -12469,7 +12275,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L182",
+      "source_location": "L175",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_collections_build_catalog",
@@ -12630,7 +12436,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L154",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stub_catalog",
@@ -12653,7 +12459,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L215",
+      "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -12665,7 +12471,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L201",
+      "source_location": "L123",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
@@ -12677,7 +12483,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L189",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
@@ -12689,7 +12495,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L309",
+      "source_location": "L231",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
@@ -12701,7 +12507,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L261",
+      "source_location": "L183",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
@@ -13172,7 +12978,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L189",
+      "source_location": "L182",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_rag_learn_collections_build_catalog",
@@ -13183,10 +12989,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/rag_learn/collections.py",
-      "source_location": "L187",
+      "source_location": "L180",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_rag_learn_collections_rationale_187",
+      "source": "src_rag_learn_collections_rationale_180",
       "target": "src_rag_learn_collections_build_catalog",
       "confidence_score": 1.0
     },
@@ -13223,7 +13029,7 @@
       "source_location": "L213",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_test_collections_test_build_catalog_contains_rag_doc_and_shanzhongshi",
+      "source": "tests_test_collections_test_build_catalog_contains_shanzhongshi",
       "target": "src_rag_learn_collections_build_catalog"
     },
     {
@@ -18777,7 +18583,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L229",
+      "source_location": "L151",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -23168,7 +22974,7 @@
       "context": "generic_arg",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L141",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stubretriever_search",
@@ -28582,7 +28388,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L154",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28593,7 +28399,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L179",
+      "source_location": "L101",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28604,7 +28410,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L130",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28615,7 +28421,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L215",
+      "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28626,7 +28432,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L201",
+      "source_location": "L123",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28637,7 +28443,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L189",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28648,7 +28454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L300",
+      "source_location": "L222",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
@@ -28659,66 +28465,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L238",
+      "source_location": "L160",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch",
       "target": "tests_test_app_launch_test_launch_filters_failed_collections",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L109",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch",
-      "target": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L86",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch",
-      "target": "tests_test_app_launch_test_migrate_idempotent_via_marker",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L67",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch",
-      "target": "tests_test_app_launch_test_migrate_moves_sqlite_and_uuid_dirs",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L99",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch",
-      "target": "tests_test_app_launch_test_migrate_noop_when_nothing_to_migrate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L52",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch",
-      "target": "tests_test_app_launch_test_migrate_noop_when_target_exists",
       "confidence_score": 1.0
     },
     {
@@ -28738,7 +28489,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L216",
+      "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -28750,7 +28501,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L202",
+      "source_location": "L124",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
@@ -28762,7 +28513,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L190",
+      "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
@@ -28774,7 +28525,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L326",
+      "source_location": "L248",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
@@ -28786,70 +28537,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L275",
+      "source_location": "L197",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
-      "target": "tests_test_app_launch_make_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L111",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "target": "tests_test_app_launch_make_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L87",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_idempotent_via_marker",
-      "target": "tests_test_app_launch_make_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L68",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_moves_sqlite_and_uuid_dirs",
-      "target": "tests_test_app_launch_make_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L100",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_nothing_to_migrate",
-      "target": "tests_test_app_launch_make_config",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L53",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_target_exists",
       "target": "tests_test_app_launch_make_config",
       "confidence_score": 1.0
     },
@@ -28858,7 +28549,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L154",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stub_catalog",
@@ -28870,7 +28561,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L133",
+      "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stubretriever_init",
@@ -28882,7 +28573,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L215",
+      "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -28894,7 +28585,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L201",
+      "source_location": "L123",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
@@ -28906,7 +28597,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L189",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
@@ -28918,7 +28609,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L300",
+      "source_location": "L222",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
@@ -28930,7 +28621,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L238",
+      "source_location": "L160",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
@@ -28938,120 +28629,13 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L109",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "target": "tests_test_app_launch_py_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L86",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_idempotent_via_marker",
-      "target": "tests_test_app_launch_py_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L67",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_moves_sqlite_and_uuid_dirs",
-      "target": "tests_test_app_launch_py_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L99",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_nothing_to_migrate",
-      "target": "tests_test_app_launch_py_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L52",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_noop_when_target_exists",
-      "target": "tests_test_app_launch_py_path",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L110",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_test_app_launch_rationale_110",
-      "target": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L109",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_migrate_fail_open_on_io_error",
-      "target": "tests_test_app_launch_py_monkeypatch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L300",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
-      "target": "tests_test_app_launch_py_monkeypatch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L238",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_test_launch_filters_failed_collections",
-      "target": "tests_test_app_launch_py_monkeypatch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_app_launch.py",
-      "source_location": "L131",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_app_launch_rationale_131",
+      "source": "tests_test_app_launch_rationale_53",
       "target": "tests_test_app_launch_stubretriever",
       "confidence_score": 1.0
     },
@@ -29060,7 +28644,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L167",
+      "source_location": "L89",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stub_catalog",
@@ -29071,7 +28655,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L138",
+      "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stubretriever",
@@ -29082,7 +28666,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L133",
+      "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stubretriever",
@@ -29093,7 +28677,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L141",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stubretriever",
@@ -29105,7 +28689,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L253",
+      "source_location": "L175",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
@@ -29116,10 +28700,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L180",
+      "source_location": "L102",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_test_app_launch_rationale_180",
+      "source": "tests_test_app_launch_rationale_102",
       "target": "tests_test_app_launch_stub_llm",
       "confidence_score": 1.0
     },
@@ -29128,7 +28712,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L179",
+      "source_location": "L101",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_stub_llm",
@@ -29140,7 +28724,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L217",
+      "source_location": "L139",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_logs_event_to_jsonl",
@@ -29152,7 +28736,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L205",
+      "source_location": "L127",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_warns_on_failed_collections",
@@ -29164,7 +28748,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L191",
+      "source_location": "L113",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_build_app_with_catalog_builds_dropdown",
@@ -29176,7 +28760,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L331",
+      "source_location": "L253",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
@@ -29188,7 +28772,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L273",
+      "source_location": "L195",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_app_launch_test_launch_filters_failed_collections",
@@ -29199,11 +28783,35 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_app_launch.py",
-      "source_location": "L239",
+      "source_location": "L161",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_test_app_launch_rationale_239",
+      "source": "tests_test_app_launch_rationale_161",
       "target": "tests_test_app_launch_test_launch_filters_failed_collections",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_app_launch.py",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_app_launch_test_launch_filters_failed_collections",
+      "target": "tests_test_app_launch_py_monkeypatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_app_launch.py",
+      "source_location": "L222",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_app_launch_test_launch_exits_when_all_collections_fail",
+      "target": "tests_test_app_launch_py_monkeypatch",
       "confidence_score": 1.0
     },
     {
@@ -29856,7 +29464,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_collections",
-      "target": "tests_test_collections_test_build_catalog_contains_rag_doc_and_shanzhongshi",
+      "target": "tests_test_collections_test_build_catalog_contains_shanzhongshi",
       "confidence_score": 1.0
     },
     {
@@ -37532,5 +37140,5 @@
       "source_file": "README.md"
     }
   ],
-  "built_at_commit": "dbdd6da1bfdcfadb0d7169a9bc656fe3cec48d8e"
+  "built_at_commit": "99f3ce56de1440beeef8e3f8b050274a9764e328"
 }

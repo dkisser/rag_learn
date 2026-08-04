@@ -118,7 +118,7 @@ def load_config() -> Config:
         chunk_size=int(os.environ.get("CHUNK_SIZE", "800")),
         chunk_overlap=int(os.environ.get("CHUNK_OVERLAP", "50")),
         repo_root=repo_root,
-        docs_dir=repo_root / "docs" / "rag_doc",
+        docs_dir=repo_root / "docs" / "shanzhongshi",
         data_dir=repo_root / "data",
         chroma_dir=repo_root / "data" / "chroma",
         milvus_path=repo_root / "data" / "milvus.db",

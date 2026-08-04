@@ -260,7 +260,7 @@ def test_answer_stream_with_config_over_fetches_candidates() -> None:
         chunk_size=800,
         chunk_overlap=50,
         repo_root=Path(__file__).parent.parent / "src",
-        docs_dir=Path(__file__).parent.parent / "docs" / "rag_doc",
+        docs_dir=Path(__file__).parent.parent / "docs" / "shanzhongshi",
         data_dir=Path(__file__).parent.parent / "data",
         chroma_dir=Path(__file__).parent.parent / "data" / "chroma",
         milvus_path=Path(__file__).parent.parent / "data" / "milvus.db",

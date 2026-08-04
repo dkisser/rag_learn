@@ -85,7 +85,7 @@ class MilvusRetriever:
     def __init__(
         self,
         db_path: Path,
-        collection_name: str = "rag_doc",
+        collection_name: str = "shanzhongshi",
         dim: int = 384,
     ) -> None:
         # Local imports keep this module cheap to import in unrelated tests.
