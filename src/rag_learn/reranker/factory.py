@@ -20,6 +20,7 @@ def build_reranker(config: Config) -> Reranker | None:
             model_name=config.rerank_model,
             device=config.rerank_device,
             batch_size=config.rerank_batch_size,
+            min_score=config.rerank_min_score,
         )
     except Exception as exc:  # noqa: BLE001 — load failure is fail-open
         logger.warning(

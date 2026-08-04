@@ -15,6 +15,7 @@ def build_retriever(
     *,
     hybrid_enabled: bool = False,
     hybrid_rrf_k: int = 60,
+    chroma_max_distance: float | None = None,
 ) -> BaseRetriever:
     """Build a retriever instance.
 
@@ -28,5 +29,10 @@ def build_retriever(
             persist_dir=persist_dir,
             collection_name=collection_name,
             rrf_k=hybrid_rrf_k,
+            max_distance=chroma_max_distance,
         )
-    return ChromaRetriever(persist_dir=persist_dir, collection_name=collection_name)
+    return ChromaRetriever(
+        persist_dir=persist_dir,
+        collection_name=collection_name,
+        max_distance=chroma_max_distance,
+    )

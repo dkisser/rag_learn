@@ -78,6 +78,27 @@ class TestCrossEncoderReranker:
             max_length=256,
         )
 
+    @patch("sentence_transformers.CrossEncoder")
+    def test_rank_filters_scores_below_threshold_inclusively(self, mock_cls: MagicMock) -> None:
+        from rag_learn.reranker.cross_encoder_impl import CrossEncoderReranker
+
+        model = MagicMock()
+        model.predict.return_value = [0.0005, 0.001, 0.9]
+        mock_cls.return_value = model
+
+        hits = [
+            Hit(text="low", source_file="low.md", chunk_index=0, score=0.1),
+            Hit(text="boundary", source_file="boundary.md", chunk_index=0, score=0.2),
+            Hit(text="high", source_file="high.md", chunk_index=0, score=0.3),
+        ]
+        reranker = CrossEncoderReranker("dummy-model", min_score=0.001)
+
+        ranked = reranker.rank("query", hits)
+
+        assert [hit.text for hit in ranked] == ["high", "boundary"]
+        assert [hit.score for hit in ranked] == [0.9, 0.001]
+        assert ranked[0] is not hits[2]
+
 
 class TestBuildReranker:
     """Tests for build_reranker factory."""
@@ -150,6 +171,7 @@ class TestBuildReranker:
             decompose_max=8,
             catalog_sub_k=20,
             catalog_recall_k=20,
+            rerank_min_score=0.001,
         )
         result = build_reranker(config)
         assert result is mock_instance
@@ -157,6 +179,7 @@ class TestBuildReranker:
             model_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
             device="cpu",
             batch_size=16,
+            min_score=0.001,
         )
 
     @patch("rag_learn.reranker.factory.CrossEncoderReranker")

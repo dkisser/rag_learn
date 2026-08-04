@@ -34,6 +34,7 @@ def _load_catalog(config: Any) -> Catalog:
     return build_catalog(
         hybrid_enabled=config.hybrid_enabled,
         hybrid_rrf_k=config.hybrid_rrf_k,
+        chroma_max_distance=config.chroma_max_distance,
     )
 
 

@@ -156,3 +156,53 @@ def test_load_config_routing_overrides(monkeypatch):
     assert cfg.decompose_timeout_s == 9.0
     assert cfg.decompose_max == 5
     assert cfg.catalog_recall_k == 30
+
+
+def test_load_config_threshold_defaults(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.delenv("CHROMA_MAX_DISTANCE", raising=False)
+    monkeypatch.delenv("RERANK_MIN_SCORE", raising=False)
+    cfg = load_config()
+    assert cfg.chroma_max_distance == 1.0
+    assert cfg.rerank_min_score == 0.001
+
+
+def test_load_config_threshold_overrides(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("CHROMA_MAX_DISTANCE", "0.75")
+    monkeypatch.setenv("RERANK_MIN_SCORE", "0.25")
+    cfg = load_config()
+    assert cfg.chroma_max_distance == 0.75
+    assert cfg.rerank_min_score == 0.25
+
+
+def test_load_config_empty_thresholds_disable_filters(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("CHROMA_MAX_DISTANCE", "")
+    monkeypatch.setenv("RERANK_MIN_SCORE", "  ")
+    cfg = load_config()
+    assert cfg.chroma_max_distance is None
+    assert cfg.rerank_min_score is None
+
+
+@pytest.mark.parametrize("name", ["CHROMA_MAX_DISTANCE", "RERANK_MIN_SCORE"])
+def test_load_config_rejects_non_numeric_threshold(monkeypatch, name):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv(name, "not-a-number")
+    with pytest.raises(ConfigError, match=name):
+        load_config()
+
+
+def test_load_config_rejects_negative_chroma_distance(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("CHROMA_MAX_DISTANCE", "-0.1")
+    with pytest.raises(ConfigError, match="CHROMA_MAX_DISTANCE"):
+        load_config()
+
+
+@pytest.mark.parametrize("value", ["nan", "inf", "-inf"])
+def test_load_config_rejects_non_finite_thresholds(monkeypatch, value):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "k")
+    monkeypatch.setenv("RERANK_MIN_SCORE", value)
+    with pytest.raises(ConfigError, match="RERANK_MIN_SCORE"):
+        load_config()

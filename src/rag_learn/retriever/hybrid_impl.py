@@ -23,6 +23,7 @@ class HybridRetriever:
         collection_name: str = "rag_doc",
         *,
         rrf_k: int = 60,
+        max_distance: float | None = None,
         vector_retriever: ChromaRetriever | None = None,
         bm25_index: BM25Index | None = None,
     ) -> None:
@@ -30,7 +31,9 @@ class HybridRetriever:
         self._collection_name = collection_name
         self._rrf_k = rrf_k
         self._vector = vector_retriever or ChromaRetriever(
-            persist_dir=persist_dir, collection_name=collection_name
+            persist_dir=persist_dir,
+            collection_name=collection_name,
+            max_distance=max_distance,
         )
         self._bm25 = bm25_index or BM25Index()
 

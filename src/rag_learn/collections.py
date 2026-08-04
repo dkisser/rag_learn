@@ -124,7 +124,10 @@ class Catalog:
 
 
 def _make_factory(
-    *, hybrid_enabled: bool, hybrid_rrf_k: int
+    *,
+    hybrid_enabled: bool,
+    hybrid_rrf_k: int,
+    chroma_max_distance: float | None = None,
 ) -> Callable[[Path, str], BaseRetriever]:
     """Build a retriever factory that captures the hybrid config."""
     from rag_learn.retriever.factory import build_retriever
@@ -135,18 +138,26 @@ def _make_factory(
             collection_name=name,
             hybrid_enabled=hybrid_enabled,
             hybrid_rrf_k=hybrid_rrf_k,
+            chroma_max_distance=chroma_max_distance,
         )
 
     return _factory
 
 
 def _build_builtin(
-    *, hybrid_enabled: bool = False, hybrid_rrf_k: int = 60
+    *,
+    hybrid_enabled: bool = False,
+    hybrid_rrf_k: int = 60,
+    chroma_max_distance: float | None = None,
 ) -> tuple[Collection, ...]:
     from rag_learn.config import _repo_root
 
     root = _repo_root() / "docs"
-    factory = _make_factory(hybrid_enabled=hybrid_enabled, hybrid_rrf_k=hybrid_rrf_k)
+    factory = _make_factory(
+        hybrid_enabled=hybrid_enabled,
+        hybrid_rrf_k=hybrid_rrf_k,
+        chroma_max_distance=chroma_max_distance,
+    )
     return (
         Collection(
             name="rag_doc",
@@ -168,8 +179,16 @@ def _build_builtin(
 BUILTIN_COLLECTIONS: tuple[Collection, ...] = _build_builtin()
 
 
-def build_catalog(hybrid_enabled: bool = False, hybrid_rrf_k: int = 60) -> Catalog:
-    """Build the default catalog, optionally wiring hybrid retrieval."""
+def build_catalog(
+    hybrid_enabled: bool = False,
+    hybrid_rrf_k: int = 60,
+    chroma_max_distance: float | None = None,
+) -> Catalog:
+    """Build the default catalog, optionally wiring hybrid retrieval and filtering."""
     return Catalog(
-        collections=_build_builtin(hybrid_enabled=hybrid_enabled, hybrid_rrf_k=hybrid_rrf_k)
+        collections=_build_builtin(
+            hybrid_enabled=hybrid_enabled,
+            hybrid_rrf_k=hybrid_rrf_k,
+            chroma_max_distance=chroma_max_distance,
+        )
     )

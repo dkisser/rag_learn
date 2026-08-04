@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -48,6 +49,8 @@ class Config:
     decompose_max: int
     catalog_sub_k: int
     catalog_recall_k: int
+    chroma_max_distance: float | None = None
+    rerank_min_score: float | None = None
 
 
 def _repo_root() -> Path:
@@ -71,6 +74,22 @@ def _parse_bool(value: str | None, default: bool) -> bool:
     return value.strip().lower() in ("1", "true", "yes", "on")
 
 
+def _parse_optional_float(value: str | None, *, name: str, default: float | None) -> float | None:
+    """解析可选的有限浮点数，留空表示禁用该配置。"""
+    if value is None:
+        return default
+    stripped = value.strip()
+    if not stripped:
+        return None
+    try:
+        parsed = float(stripped)
+    except ValueError as exc:
+        raise ConfigError(f"{name} must be a finite number") from exc
+    if not math.isfinite(parsed):
+        raise ConfigError(f"{name} must be a finite number")
+    return parsed
+
+
 def load_config() -> Config:
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
@@ -79,6 +98,18 @@ def load_config() -> Config:
     repo_root = _repo_root()
     rerank_k_raw = os.environ.get("RERANK_K")
     rerank_device = os.environ.get("RERANK_DEVICE", "auto")
+    chroma_max_distance = _parse_optional_float(
+        os.environ.get("CHROMA_MAX_DISTANCE"),
+        name="CHROMA_MAX_DISTANCE",
+        default=1.0,
+    )
+    if chroma_max_distance is not None and chroma_max_distance < 0:
+        raise ConfigError("CHROMA_MAX_DISTANCE must be non-negative")
+    rerank_min_score = _parse_optional_float(
+        os.environ.get("RERANK_MIN_SCORE"),
+        name="RERANK_MIN_SCORE",
+        default=0.001,
+    )
     return Config(
         deepseek_api_key=api_key,
         llm_model=os.environ.get("LLM_MODEL", "deepseek-v4-flash"),
@@ -106,4 +137,6 @@ def load_config() -> Config:
         decompose_max=int(os.environ.get("DECOMPOSE_MAX", "8")),
         catalog_sub_k=int(os.environ.get("CATALOG_SUB_K", "8")),
         catalog_recall_k=int(os.environ.get("CATALOG_RECALL_K", "20")),
+        chroma_max_distance=chroma_max_distance,
+        rerank_min_score=rerank_min_score,
     )

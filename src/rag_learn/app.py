@@ -277,6 +277,7 @@ def launch() -> None:
     catalog = build_catalog(
         hybrid_enabled=config.hybrid_enabled,
         hybrid_rrf_k=config.hybrid_rrf_k,
+        chroma_max_distance=config.chroma_max_distance,
     )
     logger.info("Catalog: %d collections %s", len(catalog.collections), catalog.names())
     raw_warnings = catalog.ensure_all_indexed()
