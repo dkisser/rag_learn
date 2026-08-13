@@ -1,5 +1,7 @@
 # rag-learn
 
+> 🌐 **Languages**: [English (current)](#) · [中文](./README.zh-CN.md)
+
 > **Learn RAG by measuring, not by tricks** — a progressive Chroma learning project, where every optimization starts from a number on an eval report.
 >
 > 用 Chroma 一步步把 RAG 跑通、用数据说话。
