@@ -1,7 +1,7 @@
 [project]
 name = "rag-learn"
 version = "0.1.0"
-description = "RAG comparison demo: Chroma vs Milvus Lite over 25 RAG markdown docs."
+description = "A progressive RAG learning project on Chroma: every optimization starts from a number on an eval report (recall@k, MRR, NDCG, LLM-judge metrics)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
