@@ -1,10 +1,10 @@
 # rag-learn
 
-> 🌐 **Languages**: [English (current)](#) · [中文](./README.zh-CN.md)
+> 🌐 **语言**: [English](./README.md) · **中文（当前）**
 
-> **Learn RAG by measuring, not by tricks** — a progressive Chroma learning project, where every optimization starts from a number on an eval report.
+> **用数据说话，不用技巧堆叠** —— 一个基于 Chroma 的渐进式 RAG 学习工程，每一次优化都从评估报告里的数字出发。
 >
-> 用 Chroma 一步步把 RAG 跑通、用数据说话。
+> Learn RAG by measuring, not by tricks — a progressive Chroma learning project, where every optimization starts from a number on an eval report.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Gradio 5](https://img.shields.io/badge/gradio-5-orange.svg)](https://gradio.app/)
@@ -14,29 +14,29 @@
 [![Coverage 80%+](https://img.shields.io/badge/coverage-80%25%2B-success.svg)](#tests)
 
 ```
-Question ─▶ Catalog ─▶ Hybrid (BM25 + vector, RRF) ─▶ Reranker (cross-encoder)
+Question ─▶ Catalog ─▶ Hybrid (BM25 + 向量, RRF) ─▶ Reranker (cross-encoder)
                                                           │
                                                           ▼
-Gradio UI ◀── DeepSeek stream ◀── top-k filter ◀── Chroma store
+Gradio UI ◀── DeepSeek 流式回答 ◀── top-k 过滤 ◀── Chroma 存储
    │
-   └─▶ JSONL eval event  (rag_events_YYYY-MM-DD.jsonl)
+   └─▶ JSONL 评估事件  (rag_events_YYYY-MM-DD.jsonl)
 ```
 
-## Why this project
+## 为什么做这个项目
 
 RAG 在生产里"突然不灵"的频率，远高于"加了 hybrid / reranker / routing 之后立刻变好"的频率。本项目不是又一个技巧清单，而是一个**以评估闭环为骨架**的学习工程：
 
-- **RAG 不会因为你换了 retriever 就自动变聪明**——它会变的前提是：你有 ground truth、能跑指标、能看到差异。
+- **RAG 不会因为你换了 retriever 就自动变聪明** —— 它会变的前提是：你有 ground truth、能跑指标、能看到差异。
 - 每一段新增能力（hybrid、rerank、routing、阈值过滤……）都伴随一组评估指标；**没有数字的优化不进主干**。
-- demo 之外还配一个 CSV 驱动的批评估 CLI（`sample / run / evaluate`），supervised + LLM-judge 两路指标都齐。
+- demo 之外还配一个 CSV 驱动的批量评估 CLI（`sample / run / evaluate`），supervised + LLM-judge 两路指标都齐。
 
-适合：
+适合这样的人：
 
 - 想学 RAG 但被 "hybrid + reranker + routing + ..." 技巧清单淹没的人。
 - 想看 LLM-judge 与 supervised 指标在真实闭环里怎么用的人。
 - 想用 Chroma 起步、逐步加能力、每次都有数字依据的人。
 
-## Features
+## 功能特性
 
 - **Chroma + 多集合目录（Catalog）**：在 Gradio 下拉切换知识库。
 - **可选混合检索**：BM25（jieba 中文分词）+ 向量，RRF 融合（`HYBRID_ENABLED`）。
@@ -44,58 +44,58 @@ RAG 在生产里"突然不灵"的频率，远高于"加了 hybrid / reranker / r
 - **Intent-aware 路由 + 子查询分解**：自动 fan-out 到多个集合（`INTENT_ENABLED` / `DECOMPOSE_ENABLED`）。
 - **检索阈值过滤**：`CHROMA_MAX_DISTANCE` 与 `RERANK_MIN_SCORE`。
 - **完整埋点**：每次问答写入 `data/rag_events_YYYY-MM-DD.jsonl`。
-- **CSV 驱动 batch eval**：`sample / run / evaluate` 三个子命令。
+- **CSV 驱动批量评估 CLI**：`sample / run / evaluate` 三个子命令。
 - **Supervised 指标**：`retrieval_recall@k / precision@k / MRR / NDCG@k / answer_f1`。
 - **LLM-judge 指标**：`context_relevance / faithfulness / answer_relevance / overall_usefulness / answer_llm_correctness`。
 - **Token-bucket 限流 + 断点续跑**（DeepSeek 免费档友好）。
 - **DeepSeek 流式回答**（OpenAI 兼容 SDK）。
 - **80%+ 单测覆盖**（`make all` 强制门禁）。
 
-## Table of contents
+## 目录
 
-- [Quick start](#quick-start)
-- [How it works](#how-it-works)
-- [Evolution: a progressive journey](#evolution-a-progressive-journey)
-- [Evaluation methodology](#evaluation-methodology)
-- [Env vars](#env-vars)
-- [Tests](#tests)
-- [Batch evaluation CLI](#batch-evaluation-cli)
-- [Historical adapter: Milvus](#historical-adapter-milvus)
-- [Roadmap & known limitations](#roadmap--known-limitations)
-- [Acknowledgements](#acknowledgements)
+- [快速开始](#快速开始)
+- [它是怎么工作的](#它是怎么工作的)
+- [演化路径：渐进式之旅](#演化路径渐进式之旅)
+- [评估方法论](#评估方法论)
+- [环境变量](#环境变量)
+- [测试](#测试)
+- [批量评估 CLI](#批量评估-cli)
+- [历史 adapter：Milvus](#历史-adaptermilvus)
+- [Roadmap 与已知限制](#roadmap-与已知限制)
+- [致谢](#致谢)
 - [License](#license)
 
-## Quick start
+## 快速开始
 
 ```bash
-# Option A — uv (recommended; uses the committed uv.lock)
+# 方案 A — uv（推荐；使用已 commit 的 uv.lock）
 uv sync --extra dev
 cp .env.example .env
-# edit .env to set DEEPSEEK_API_KEY
+# 编辑 .env 设置 DEEPSEEK_API_KEY
 uv run python main.py
-# open http://127.0.0.1:7860
+# 浏览器打开 http://127.0.0.1:7860
 
-# Option B — pip
+# 方案 B — pip
 pip install -e ".[dev]"
 cp .env.example .env
-# edit .env to set DEEPSEEK_API_KEY
+# 编辑 .env 设置 DEEPSEEK_API_KEY
 python main.py
-# open http://127.0.0.1:7860
+# 浏览器打开 http://127.0.0.1:7860
 ```
 
 第一次启动会自动摄入 `docs/shanzhongshi/*.md` 到 `data/chroma/`，下拉框里会出现"山中事咖啡"集合。embedder 模型首次下载后缓存。
 
-## How it works
+## 它是怎么工作的
 
 1. **摄入**：首次启动时 `docs/shanzhongshi/*.md` 被切片写入 Chroma `PersistentClient`（bundled `all-MiniLM-L6-v2` 384-dim cosine）。
 2. **选集合**：UI 顶部"知识库"下拉选当前 catalog（单集合 / 多集合扇出由 routing 决定）。
-3. **检索（可选链路）**：catalog → hybrid (BM25 + vector, RRF) → reranker (cross-encoder) → threshold filter。
-5. **生成**：DeepSeek 流式回答；折叠面板展示 chunks（file + chunk-index + 距离/分数）+ perf 行（retrieve / first-token / total）。
-6. **埋点**：每次问答同步写一行 `RAGEvent` 到 `data/rag_events_YYYY-MM-DD.jsonl`（question / hits / answer / perf / metadata），给后续离线评估消费。
+3. **检索（可选链路）**：catalog → hybrid (BM25 + 向量, RRF) → reranker (cross-encoder) → threshold filter。
+4. **生成**：DeepSeek 流式回答；折叠面板展示 chunks（file + chunk-index + 距离/分数）+ perf 行（retrieve / first-token / total）。
+5. **埋点**：每次问答同步写一行 `RAGEvent` 到 `data/rag_events_YYYY-MM-DD.jsonl`（question / hits / answer / perf / metadata），给后续离线评估消费。
 
-任何步骤的开关都在 [Env vars](#env-vars) 里；默认全关，得到的就是最朴素的"向量召回 → DeepSeek"。
+任何步骤的开关都在 [环境变量](#环境变量) 里；默认全关，得到的就是最朴素的"向量召回 → DeepSeek"。
 
-## Evolution: a progressive journey
+## 演化路径：渐进式之旅
 
 本项目按"每加一项能力，先有评估"的顺序演进。时间线真实来源于 `git log` 与 `docs/superpowers/specs/`，不是事后整理的目录：
 
@@ -111,11 +111,11 @@ python main.py
 
 原则：**每一段新增能力，都伴随一组评估指标；没有数字的优化不进主干。**
 
-## Evaluation methodology
+## 评估方法论
 
-> "没有 ground_truth，就只能算 LLM-judge；有了 ground_truth，supervised 指标才能上场——而 supervised 指标是判断'这个技巧到底有没有用'的唯一可重复依据。"
+> "没有 ground_truth，就只能算 LLM-judge；有了 ground_truth，supervised 指标才能上场 —— 而 supervised 指标是判断'这个技巧到底有没有用'的唯一可重复依据。"
 >
-> — 改写自 [`2026-07-22-batch-evaluation-design`](docs/superpowers/specs/2026-07-22-batch-evaluation-design.md) §1
+> —— 改写自 [`2026-07-22-batch-evaluation-design`](docs/superpowers/specs/2026-07-22-batch-evaluation-design.md) §1
 
 闭环长这样：
 
@@ -123,41 +123,41 @@ python main.py
 在线 UI  ──▶  JSONL (rag_events_YYYY-MM-DD.jsonl)
                        │
                        ▼
-              sample (采样未标注问题)
+              sample（采样未标注问题）
                        │
                        ▼
-              label  (人工或半自动标注 ground_truth)
+              label   （人工或半自动标注 ground_truth）
                        │
                        ▼
-              run    (批量送入 RAG，写带 ground_truth 的事件)
+              run     （批量送入 RAG，写带 ground_truth 的事件）
                        │
                        ▼
-              evaluate (aggregates / by_collection / details)
+              evaluate（aggregates / by_collection / details）
 ```
 
 `aggregates` 给出均值/中位/p95；`by_collection` 按集合切分；`details` 是逐条明细。**所有指标的判分都来自同一个事件流，避免"在线一种口径、离线另一种口径"。**
 
-## Env vars
+## 环境变量
 
 应用启动时通过 `rag_learn.config.load_config()` 读取；键名严格区分大小写。`DEEPSEEK_API_KEY` 缺失会直接 `ConfigError` 退出。
 
 | Var | Default | 说明 |
 |---|---|---|
-| `DEEPSEEK_API_KEY` | _(required)_ | DeepSeek API key，缺失则启动失败。 |
+| `DEEPSEEK_API_KEY` | _(必填)_ | DeepSeek API key，缺失则启动失败。 |
 | `LLM_MODEL` | `deepseek-v4-flash` | 任一 DeepSeek API 接受的模型。 |
 | `DEEPSEEK_BASE_URL` | `https://api.deepseek.com` | 用于走代理。 |
 | `RETRIEVE_K` | `5` | 召回 top-k。 |
 | `CHUNK_SIZE` | `800` | 切片字符上限；改后需 `rm -rf data/`。 |
 | `CHUNK_OVERLAP` | `50` | 相邻切片重叠字符。 |
 | `LOG_LEVEL` | `INFO` | 全局日志级别。 |
-| `CHROMA_MAX_DISTANCE` | _(unset)_ | cosine 距离上限，超出直接丢弃。 |
+| `CHROMA_MAX_DISTANCE` | _(未设)_ | cosine 距离上限，超出直接丢弃。 |
 | `HYBRID_ENABLED` | `false` | 打开 BM25 + 向量 RRF 融合。 |
 | `HYBRID_RRF_K` | `60` | RRF 公式中的 k 常数。 |
 | `RERANK_ENABLED` | `false` | 打开 cross-encoder rerank。 |
 | `RERANK_MODEL` | `BAAI/bge-reranker-base` | 任意 `sentence-transformers` CrossEncoder。 |
-| `RERANK_K` | _(unset)_ | rerank 前保留的候选数（默认 `RETRIEVE_K * RERANK_FACTOR`）。 |
+| `RERANK_K` | _(未设)_ | rerank 前保留的候选数（默认 `RETRIEVE_K * RERANK_FACTOR`）。 |
 | `RERANK_DEVICE` | `auto` | `cpu` / `cuda` / `mps` / `auto`。 |
-| `RERANK_MIN_SCORE` | _(unset)_ | cross-encoder 分数下限，低于丢弃。 |
+| `RERANK_MIN_SCORE` | _(未设)_ | cross-encoder 分数下限，低于丢弃。 |
 | `RERANK_FACTOR` | `4` | `RERANK_K = RETRIEVE_K * RERANK_FACTOR`。 |
 | `RERANK_BATCH_SIZE` | `8` | 批量打分。 |
 | `INTENT_ENABLED` | `false` | 打开意图分类。 |
@@ -170,22 +170,22 @@ python main.py
 
 `.env.example` 提供全部键名的占位；只要保留未启用项为注释即可。
 
-## Tests
+## 测试
 
 ```bash
 make all   # ruff lint + ty + pytest --cov-fail-under=80
-# or, under uv:
+# 或（uv 环境下）：
 uv run pytest
 ```
 
 `pyproject.toml` 强制 `--cov-fail-under=80`，低于 80% 覆盖会让 `make all` 红。`tests/test_*_retriever.py` 与 `tests/test_eval*` 是改对应模块时必动的测试。
 
-## Batch evaluation CLI
+## 批量评估 CLI
 
 `rag_learn.eval.cli` 三个子命令驱动同一份 CSV 模板（`question, answer, source_files, chunk_ids, collection`）；`source_files` / `chunk_ids` 以 `;` 分隔，可空。
 
 ```bash
-# 1) Sample 在线流量 → 待标注 CSV
+# 1) 采样在线流量 → 待标注 CSV
 uv run python -m rag_learn.eval.cli sample data \
     --samples-per-collection 5 --output samples.csv
 
@@ -225,18 +225,18 @@ uv run python -m rag_learn.eval.cli run docs/eval/shanzhongshi_qa.csv \
 
 完整设计参见 [`2026-07-22-batch-evaluation-design`](docs/superpowers/specs/2026-07-22-batch-evaluation-design.md)。
 
-## Historical adapter: Milvus
+## 历史 adapter：Milvus
 
 `src/rag_learn/retriever/milvus_impl.py` 与 `tests/test_milvus_retriever.py` 仍保留在仓库中，作为历史 adapter，**但当前主路径不再实例化**：`factory.build_retriever` 只返回 Chroma / Hybrid，`app.launch` 不再 import `MilvusRetriever`。如果你想比较 Milvus Lite，可手动 import 该 adapter 并自行承担 `pymilvus` 2.6+ 在 macOS ARM 上的 SIGSEGV 风险（参见 `CLAUDE.md` Known gotchas）。本项目不把 Milvus 作为演示特性。
 
-## Roadmap & known limitations
+## Roadmap 与已知限制
 
 - **Incremental UI streaming 还没做**。当前 `gr.Chatbot` 把整个回答聚成一次 frame update（一次 delta / 一次 click），不是按 token 增量 flush；`TODO` 在 `src/rag_learn/app.py` 标了改造点。
 - **本项目不是生产级 RAG**：不做鉴权、不做监控、不做水平扩展，只是一个学习工程。
 - **Milvus adapter 已退役但代码还在**：见上一节，不计划恢复为主路径。
 - **chunking 改了要清索引**：修改 `CHUNK_SIZE` / `CHUNK_OVERLAP` 后请先 `rm -rf data/`，再启动 app。
 
-## Acknowledgements
+## 致谢
 
 构建于以下开源项目之上：
 
@@ -253,4 +253,4 @@ uv run python -m rag_learn.eval.cli run docs/eval/shanzhongshi_qa.csv \
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT —— 见 [LICENSE](./LICENSE)。
